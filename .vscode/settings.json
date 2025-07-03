@@ -1,0 +1,8 @@
+{
+  "eslint.enable": true,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "always", // 저장 시 모든 문제 해결
+    "source.fixAll.eslint": "always" // ESLint를 저장 시 실행
+  }
+}
