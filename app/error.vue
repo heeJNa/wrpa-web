@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import type { NuxtError } from '#app'
-
-const { error } = defineProps({
-  error: Object as () => NuxtError,
-})
+  import type { NuxtError } from '#app'
+  // definePageMeta({
+  //   layout: false,
+  // })
+  const { error } = defineProps({
+    error: Object as () => NuxtError,
+  })
 </script>
 
 <template>
@@ -11,6 +13,4 @@ const { error } = defineProps({
   <FatalError v-else-if="error" />
 </template>
 
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>

@@ -2,6 +2,6 @@
 
 <template>
   <div class="layout-footer">
-    <span class="ml-2 font-medium">Sakai Nuxt Starter</span>
+    <span class="ml-2 font-medium">Footer</span>
   </div>
 </template>

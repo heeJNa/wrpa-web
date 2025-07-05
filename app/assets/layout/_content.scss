@@ -1,13 +1,14 @@
 .layout-main {
   flex: 1 1 auto;
-  padding: 2rem;
+  padding: 1rem 2rem;
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - 81px);
-  margin-top: 1.5rem;
+  height: calc(100vh - 4rem);
+  margin-top: 4rem;
 }
 
 .layout-content-wrapper {
-  padding-top: 2rem;
+  // padding-top: 2rem;
+  min-height: 100vh;
   transition: margin-left var(--element-transition-duration);
 }

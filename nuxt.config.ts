@@ -1,5 +1,5 @@
 import tailwindcss from '@tailwindcss/vite'
-import esLocale from './app/theme/locale/es.json'
+import koLocale from './app/theme/locale/ko.json'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -8,7 +8,7 @@ export default defineNuxtConfig({
     '@primevue/nuxt-module',
     '@nuxt/eslint',
     '@vueuse/nuxt',
-    'nuxt-security',
+    // 'nuxt-security',
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
   ],
@@ -31,6 +31,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     rpaApiUrl: '',
+    rpaAuthApiUrl: '',
     public: {
       appName: 'WRPA-Webb',
     }
@@ -77,13 +78,21 @@ export default defineNuxtConfig({
     importTheme: { from: '@/theme/app-theme.ts' },
     options: {
       ripple: true,
+      pt: {
+        column: {
+          columnHeaderContent: {
+            class: ['justify-center']
+          }
+        }
+      },
       // Choose your language here: https://github.com/primefaces/primelocale
-      locale: { ...esLocale },
+      locale: { ...koLocale },
     },
   },
-  security: {
-    headers: {
-      contentSecurityPolicy: false,
-    },
-  },
+  // security: {
+  //   enabled: process.env.NODE_ENV === 'production',
+  //   headers: {
+  //     contentSecurityPolicy: false,
+  //   },
+  // },
 })

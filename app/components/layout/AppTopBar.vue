@@ -19,7 +19,7 @@
       expiresIn: number
       header: string
       token: string
-    }>('/api/logout', {
+    }>('/api/auth/logout', {
       method: 'POST',
     })
     if (statusCode.value === 200) {

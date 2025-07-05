@@ -6,6 +6,7 @@
       fatal: true,
     })
   }
+  const { insuranceCompanyCodes } = useGlobalData()
 </script>
 
 <template>
@@ -30,6 +31,11 @@
           to="/auth/access"
           label="Unauthorized Page" />
         <Button as="router-link" to="/login" label="Login Page" />
+      </div>
+      <h4 class="mt-10">Global Datas</h4>
+
+      <div class="flex w-1/6 flex-wrap gap-6">
+        {{ insuranceCompanyCodes.map((code) => code.name).join(', ') }}
       </div>
     </div>
   </div>

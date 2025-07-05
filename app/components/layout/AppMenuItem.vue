@@ -1,71 +1,71 @@
 <script setup>
-const { layoutConfig, layoutState, setActiveMenuItem, onMenuToggle } = useLayout()
-const props = defineProps({
-  item: {
-    type: Object,
-    default: () => ({}),
-  },
-  index: {
-    type: Number,
-    default: 0,
-  },
-  root: {
-    type: Boolean,
-    default: true,
-  },
-  parentItemKey: {
-    type: String,
-    default: null,
-  },
-})
-const isActiveMenu = ref(false)
-const itemKey = ref(null)
+  const { layoutConfig, layoutState, setActiveMenuItem, onMenuToggle } = useLayout()
+  const props = defineProps({
+    item: {
+      type: Object,
+      default: () => ({}),
+    },
+    index: {
+      type: Number,
+      default: 0,
+    },
+    root: {
+      type: Boolean,
+      default: true,
+    },
+    parentItemKey: {
+      type: String,
+      default: null,
+    },
+  })
+  const isActiveMenu = ref(false)
+  const itemKey = ref(null)
 
-onBeforeMount(() => {
-  itemKey.value = props.parentItemKey
-    ? props.parentItemKey + '-' + props.index
-    : String(props.index)
-  const activeItem = layoutState.activeMenuItem.value
+  onBeforeMount(() => {
+    itemKey.value = props.parentItemKey
+      ? props.parentItemKey + '-' + props.index
+      : String(props.index)
+    const activeItem = layoutState.activeMenuItem.value
 
-  isActiveMenu.value =
-    activeItem === itemKey.value || activeItem
-      ? activeItem.startsWith(itemKey.value + '-')
-      : false
-})
-
-watch(
-  () => layoutConfig.activeMenuItem.value,
-  (newVal) => {
     isActiveMenu.value =
-      newVal === itemKey.value || newVal.startsWith(itemKey.value + '-')
-  },
-)
+      activeItem === itemKey.value || activeItem
+        ? activeItem.startsWith(itemKey.value + '-')
+        : false
+  })
 
-const itemClick = (event, item) => {
-  if (item.disabled) {
-    event.preventDefault()
+  watch(
+    () => layoutConfig.activeMenuItem.value,
+    (newVal) => {
+      isActiveMenu.value =
+        newVal === itemKey.value || newVal.startsWith(itemKey.value + '-')
+    },
+  )
 
-    return
+  const itemClick = (event, item) => {
+    if (item.disabled) {
+      event.preventDefault()
+
+      return
+    }
+
+    const { overlayMenuActive, staticMenuMobileActive } = layoutState
+
+    if (
+      (item.to || item.url) &&
+      (staticMenuMobileActive.value || overlayMenuActive.value)
+    ) {
+      onMenuToggle()
+    }
+
+    if (item.command) {
+      item.command({ originalEvent: event, item: item })
+    }
+
+    if (item.items) {
+      const foundItemKey = isActiveMenu.value ? props.parentItemKey : itemKey
+      setActiveMenuItem(foundItemKey)
+    }
   }
-
-  const { overlayMenuActive, staticMenuMobileActive } = layoutState
-
-  if (
-    (item.to || item.url)
-    && (staticMenuMobileActive.value || overlayMenuActive.value)
-  ) {
-    onMenuToggle()
-  }
-
-  if (item.command) {
-    item.command({ originalEvent: event, item: item })
-  }
-
-  if (item.items) {
-    const foundItemKey = isActiveMenu.value ? props.parentItemKey : itemKey
-    setActiveMenuItem(foundItemKey)
-  }
-}
 </script>
 
 <template>

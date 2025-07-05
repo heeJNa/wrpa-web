@@ -1,11 +1,4 @@
-<script setup>
-  const modules = ref([
-    {
-      label: 'Home',
-      items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' }],
-    },
-  ])
-</script>
+<script setup></script>
 
 <template>
   <ul class="layout-menu">
@@ -38,10 +31,10 @@
       <span>WRPA</span>
     </NuxtLink>
 
-    <template v-for="(item, i) in modules" :key="item">
+    <template v-for="(item, i) in menus" :key="item">
       <layout-app-menu-item v-if="!item.separator" :item="item" :index="i" />
-      <li class="menu-separator" v-if="item.separator"></li
-    ></template>
+      <li class="menu-separator" v-if="item.separator"></li>
+    </template>
     <li></li>
   </ul>
 </template>

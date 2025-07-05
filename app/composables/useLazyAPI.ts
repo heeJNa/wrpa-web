@@ -6,6 +6,9 @@ export function useLazyAPI<T>(
   options?: UseFetchOptions<T>,
 ) {
   return useLazyFetch(url, {
+    headers: {
+      ...useRequestHeaders()
+    },
     ...options,
     $fetch: useNuxtApp().$api,
   })

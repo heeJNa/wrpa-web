@@ -17,7 +17,7 @@
     if (!validate()) {
       return
     }
-    const { data } = await request<any>('/api/login', {
+    const { data } = await request<any>('/api/auth/login', {
       method: 'POST',
       body: JSON.stringify({
         providerKey: id.value,
@@ -102,22 +102,28 @@
                 id="id"
                 v-model="id"
                 type="text"
-                placeholder="User ID" />
+                placeholder="User ID"
+                @keypress.enter="signIn" />
               <small class="p-error" v-if="errors.id">{{ errors.id[0] }}</small>
             </div>
-            <label
-              class="text-surface-900 dark:text-surface-0 mb-2 block text-xl font-medium"
-              for="password1"
-              >Password</label
-            >
-            <Password
-              class="mb-4"
-              id="password1"
-              v-model="password"
-              placeholder="Password"
-              :toggle-mask="true"
-              fluid
-              :feedback="false" />
+            <div class="mb-4 flex flex-col">
+              <label
+                class="text-surface-900 dark:text-surface-0 mb-2 block text-xl font-medium"
+                for="password1"
+                >Password</label
+              >
+              <Password
+                id="password1"
+                v-model="password"
+                placeholder="비밀번호"
+                :toggle-mask="true"
+                fluid
+                :feedback="false"
+                @keypress.enter="signIn" />
+              <small class="p-error" v-if="errors.password">{{
+                errors.password[0]
+              }}</small>
+            </div>
 
             <div class="mt-2 mb-8 flex items-center justify-between gap-8">
               <div class="flex items-center">

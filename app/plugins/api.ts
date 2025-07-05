@@ -2,12 +2,14 @@ export default defineNuxtPlugin((nuxtApp) => {
   const toast = useToast()
 
   const api = $fetch.create({
-    onRequest({ request }) {
-      console.log('Sending request to ' + request)
-    },
+    // onRequest({ request }) {
+    //   console.log('Sending request to ' + request)
+    // },
     async onResponseError({ response }) {
       if (response.status === 401 || response.status === 403) {
-        await nuxtApp.runWithContext(() => navigateTo('/login'))
+        await $fetch('/api/auth/revoke').then(async () => {
+          await nuxtApp.runWithContext(() => navigateTo('/login'))
+        })
       } else if (
         response.status === 404
         || response.status === 400
