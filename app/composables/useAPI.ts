@@ -1,10 +1,6 @@
 import type { NitroFetchRequest } from 'nitropack/types'
-import type { AsyncDataOptions, UseFetchOptions } from 'nuxt/app'
-import type { FetchOptions } from 'ofetch';
+import type { UseFetchOptions } from 'nuxt/app'
 
-interface CustomFetchOptions extends Omit<FetchOptions, 'method'> {
-  method?: "GET" | "HEAD" | "PATCH" | "POST" | "PUT" | "DELETE" | "CONNECT" | "OPTIONS" | "TRACE" | undefined
-}
 
 export const useAPI = <T>(
   url: NitroFetchRequest,
@@ -15,12 +11,8 @@ export const useAPI = <T>(
     headers: {
       ...useRequestHeaders()
     },
+    watch: false,
     ...(options as any),
     $fetch: useNuxtApp().$api,
   })
-  // return useAsyncData<T>(key, () => useRequestFetch()(url, {
-  //   ...options,
-  // }), {
-  //   ...asyncOptions,
-  // })
 }

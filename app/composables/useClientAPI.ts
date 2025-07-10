@@ -22,11 +22,13 @@ export const useClientAPI = () => {
               life: 5000,
             })
           } else {
+            console.log('Fetch error:', ctx)
+            console.log('data:', ctx.data)
             toast.add({
               severity: 'error',
               summary: 'Error',
               detail:
-                ctx.data?.message || ctx.error?.message || 'An unexpected error occurred',
+                ctx.data?.data?.message || ctx.error?.message || 'An unexpected error occurred',
               life: 5000,
             })
           }

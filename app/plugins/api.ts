@@ -5,10 +5,20 @@ export default defineNuxtPlugin((nuxtApp) => {
     // onRequest({ request }) {
     //   console.log('Sending request to ' + request)
     // },
+    retryStatusCodes: [502, 503, 504],
     async onResponseError({ response }) {
       if (response.status === 401 || response.status === 403) {
         await $fetch('/api/auth/revoke').then(async () => {
-          await nuxtApp.runWithContext(() => navigateTo('/login'))
+          await nuxtApp.runWithContext(() => {
+            const tokenState = useState('accessToken')
+            tokenState.value = null;
+            toast.add({
+              severity: 'error',
+              summary: '세션이 만료되었습니다. 다시 로그인해주세요.',
+              life: 5000,
+            })
+            navigateTo('/login')
+          })
         })
       } else if (
         response.status === 404

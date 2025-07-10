@@ -1,13 +1,14 @@
 <script setup lang="ts">
   import { useLoginForm } from '~/composables/forms/useLoginForm'
+  import { FetchError } from 'ofetch'
 
   definePageMeta({
     layout: false,
   })
   const { appName } = useRuntimeConfig().public
-  const { request } = useClientAPI()
   const { id, password, errors, validate } = useLoginForm()
   const checked = ref(false)
+  const toast = useToast()
 
   const signIn = async () => {
     const os = useCookie('os')
@@ -17,22 +18,40 @@
     if (!validate()) {
       return
     }
-    const { data } = await request<any>('/api/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({
-        providerKey: id.value,
-        authInfo: password.value,
-        providerId: 'credential',
-        deviceInfo: {
-          os: os.value,
-          token: '',
-          appName: appName,
-        },
-      }),
-      credentials: 'include',
-    })
-    if (data.value) {
-      await navigateTo('/', { replace: true, external: true })
+    try {
+      const data = await $fetch<any>('/api/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({
+          providerKey: id.value,
+          authInfo: password.value,
+          providerId: 'credential',
+          deviceInfo: {
+            os: os.value,
+            token: '',
+            appName: appName,
+          },
+        }),
+        credentials: 'include',
+      })
+      if (data) {
+        await navigateTo('/', { replace: true, external: true })
+      }
+    } catch (error) {
+      if (error instanceof FetchError && error.statusCode === 401) {
+        toast.add({
+          severity: 'error',
+          summary: '로그인 실패',
+          detail: '아이디 또는 비밀번호가 일치하지 않습니다.',
+          life: 5000,
+        })
+      } else {
+        toast.add({
+          severity: 'error',
+          summary: '로그인 실패',
+          detail: '알 수 없는 오류가 발생했습니다. 다시 시도해주세요.',
+          life: 5000,
+        })
+      }
     }
   }
 </script>
@@ -41,7 +60,6 @@
   <div
     class="bg-surface-50 dark:bg-surface-950 flex min-h-screen min-w-[100vw] items-center justify-center overflow-hidden">
     <div class="flex flex-col items-center justify-center">
-      {{ appName }}
       <div
         style="
           border-radius: 56px;

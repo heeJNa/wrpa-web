@@ -87,18 +87,18 @@
         <i :class="['pi', { 'pi-moon': isDarkTheme, 'pi-sun': !isDarkTheme }]" />
         <span>Dark Mode</span>
       </button>
-      <button class="layout-topbar-button" as="router-link" @click="onTopBarMenuButton()">
+      <!-- <button class="layout-topbar-button" as="router-link" @click="onTopBarMenuButton()">
         <i class="pi pi-calendar" />
         <span>Calendar</span>
-      </button>
-      <button class="layout-topbar-button" as="router-link" @click="onProfileClick">
+      </button> -->
+      <!-- <button class="layout-topbar-button" as="router-link" @click="onProfileClick">
         <i class="pi pi-user" />
         <span>Profile</span>
-      </button>
-      <button class="layout-topbar-button" as="router-link">
+      </button> -->
+      <!-- <button class="layout-topbar-button" as="router-link">
         <i class="pi pi-cog" />
         <span>Settings</span>
-      </button>
+      </button> -->
       <button class="layout-topbar-button" as="router-link" @click="onLogoutClick">
         <i class="pi pi-sign-out" />
         <span>Logout</span>

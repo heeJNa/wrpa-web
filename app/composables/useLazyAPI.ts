@@ -9,6 +9,7 @@ export function useLazyAPI<T>(
     headers: {
       ...useRequestHeaders()
     },
+    watch: false,
     ...options,
     $fetch: useNuxtApp().$api,
   })

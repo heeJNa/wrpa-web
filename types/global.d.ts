@@ -18,7 +18,7 @@ declare global {
     values: T[],
     pagingInfo: PagingInfo
   }
-  type InsuranceCompanyType = "LIFE" | "PROPERTY" | "GUARANTEE";
+  type InsuranceCompanyType = "ALL" | "LIFE" | "PROPERTY" | "GUARANTEE";
   interface InsuranceCompanyCode {
     code: string,
     name: string,
@@ -26,6 +26,14 @@ declare global {
     type: InsuranceCompanyType,
     typePretty: string,
     value: string
+  }
+  interface LabelValue {
+    label?: string,
+    value?: string
+  }
+  interface EnumPretty {
+    name?: string,
+    pretty?: string
   }
 }
 declare module '#app' {

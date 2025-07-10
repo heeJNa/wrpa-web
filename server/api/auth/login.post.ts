@@ -1,4 +1,5 @@
 // import CryptoJS from 'crypto-js';
+import { FetchError } from 'ofetch'
 
 export default defineWrappedResponseHandler(async (event) => {
   const { rpaAuthApiUrl } = useRuntimeConfig(event)
@@ -10,6 +11,7 @@ export default defineWrappedResponseHandler(async (event) => {
   //   CryptoJS.enc.Utf8,
   // ); // 임시 복호화
   const url = new URL('/api/auth/login', rpaAuthApiUrl)
+
   const data = await $fetch<any>(url.toString(), {
     body: {
       providerKey: body.providerKey,
@@ -29,12 +31,8 @@ export default defineWrappedResponseHandler(async (event) => {
     })
     return true
   } else {
-    return sendError(
-      event,
-      createError({
-        statusCode: 401,
-        statusMessage: '로그인에 실패했습니다.',
-      }),
-    )
+    throw createError('로그인에 실패했습니다.')
   }
+
+
 })

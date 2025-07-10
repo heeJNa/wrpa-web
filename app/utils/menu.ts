@@ -19,7 +19,11 @@ export const menus: MenuItem[] = [
     // },
     {
         label: 'RPA',
-        items: [{ label: '작업PC', icon: 'pi pi-fw pi-desktop', to: '/rpa/worker' }],
+        items: [{ label: '작업PC', icon: 'pi pi-fw pi-desktop', to: '/rpa/worker' },
+        { label: '작업파일', icon: 'pi pi-fw pi-file', to: '/rpa/file' },
+        { label: '작업일정', icon: 'pi pi-fw pi-calendar-clock', to: '/rpa/schedule' },
+        { label: '작업현황', icon: 'pi pi-fw pi-list-check', to: '/rpa/state' }
+        ],
     },
 ]
 

@@ -6,7 +6,6 @@
       fatal: true,
     })
   }
-  const { insuranceCompanyCodes } = useGlobalData()
 </script>
 
 <template>
@@ -35,7 +34,7 @@
       <h4 class="mt-10">Global Datas</h4>
 
       <div class="flex w-1/6 flex-wrap gap-6">
-        {{ insuranceCompanyCodes.map((code) => code.name).join(', ') }}
+        <!-- {{ insuranceCompanyCodes.map((code) => code.name).join(', ') }} -->
       </div>
     </div>
   </div>
