@@ -4,6 +4,11 @@ interface MenuItem {
     to?: string;
     items?: MenuItem[];
 }
+interface BreadCrumbItem {
+    label: string;
+    route: string;
+    icon?: string;
+}
 export const menus: MenuItem[] = [
     {
         label: 'Home',
@@ -27,7 +32,7 @@ export const menus: MenuItem[] = [
     },
 ]
 
-export const getMenuChainFindByMenuPath = (
+export const getMenuLabelChainFindByMenuPath = (
     menus: MenuItem[],
     targetTo: string
 ): string[] | null => {
@@ -38,9 +43,29 @@ export const getMenuChainFindByMenuPath = (
         }
         // 하위 items가 있으면 재귀 탐색
         if (menu.items) {
-            const childPath = getMenuChainFindByMenuPath(menu.items, targetTo);
+            const childPath = getMenuLabelChainFindByMenuPath(menu.items, targetTo);
             if (childPath) {
                 return [menu.label, ...childPath];
+            }
+        }
+    }
+    return null; // 못 찾은 경우
+}
+
+export const getMenuChainFindByMenuPath = (
+    menus: MenuItem[],
+    targetTo: string
+): BreadCrumbItem[] | null => {
+    for (const menu of menus) {
+        // 현재 메뉴의 to와 일치하면 label 반환
+        if (menu.to === targetTo) {
+            return [{ label: menu.label, route: menu.to || '', icon: menu.icon || '' }];
+        }
+        // 하위 items가 있으면 재귀 탐색
+        if (menu.items) {
+            const childPath = getMenuChainFindByMenuPath(menu.items, targetTo);
+            if (childPath) {
+                return [{ label: menu.label, route: menu.to || '', icon: menu.icon || '' }, ...childPath];
             }
         }
     }

@@ -10,3 +10,18 @@ export const cutYearIfSame = (date?: string): string => {
     const dateYear = new Date(date).getFullYear();
     return dateYear === currentYear ? date.slice(5) : date;
 }
+
+export const getColorByWorkState = (workState: string): string | undefined => {
+    switch (workState) {
+        case 'success':
+            return 'success';
+        case 'working':
+            return 'warn';
+        case 'fail':
+            return 'danger';
+        case 'cancel':
+            return 'contrast';
+        default:
+            return 'secondary';
+    }
+}

@@ -1,11 +1,13 @@
 <script setup lang="ts">
-  import type { DataTableSortEvent } from 'primevue/datatable'
+  import type { DataTableRowEditSaveEvent, DataTableSortEvent } from 'primevue/datatable'
   import type { PageState } from 'primevue/paginator'
   import type { WorkerDetail } from '~~/types/worker'
 
   const { insuranceCompanyCodes } = useGlobalData()
-
-  const companyName = ref<string>()
+  const { request } = useClientAPI()
+const toast = useToast()
+  const editingRows = ref([]);
+const companyName = ref<string>()
   const tag = ref<string>()
   const type = ref<string>()
   const page = ref(0)
@@ -50,9 +52,31 @@
     page.value = 0
     execute()
   }
+
+const onEditComplete = async (event: DataTableRowEditSaveEvent<WorkerDetail>) => {
+  if (!event.newData.owners) 
+    event.newData.owners = []
+  if (!event.newData.tags) 
+    event.newData.tags = []
+   request(`/api/workers/v2/${event.newData.id}`, {
+    method: 'PUT',
+    body: JSON.stringify(event.newData),
+   }).onFetchResponse((response) => {
+     if (response.ok) {
+      toast.add({
+        severity: 'success',
+        summary: '성공',
+        detail: '작업자 정보가 성공적으로 업데이트되었습니다.',
+        life: 3000,
+      })
+      execute()
+    }
+  })
+}
 </script>
 <template>
   <ListDataTable
+     v-model:editing-row='editingRows'
     :data="data"
     :status="status"
     :page="page"
@@ -60,7 +84,11 @@
     @page="onPage"
     @sort="onSort"
     @search="execute"
-    @clearFilter="clearFilter">
+    @clearFilter="clearFilter"
+    edit-mode='row'
+    @row-edit-save='onEditComplete'
+    dataKey='id'
+    >
     <template #filters>
       <FloatLabel variant="on">
         <Select
@@ -112,18 +140,40 @@
       <Column class="text-center" field="owners" header="소유자">
         <template #body="slotProps">
           <span v-if="slotProps.data.owners && slotProps.data.owners.length > 0">
-            {{ slotProps.data.owners.map((owner: LabelValue) => owner.label).join(', ') }}
+            {{ owners?.filter((owner) => (slotProps.data.owners as string[])?.includes(owner.value ?? '')).map((owner) => owner.label).join(', ') }}
           </span>
           <span v-else>없음</span>
+        </template>
+        <template #editor="{ data, field }">
+          <MultiSelect
+            v-model="data[field]"
+            :options="owners"
+            showClear
+            label-id="on_label"
+            option-label="label"
+            option-value="value"
+            fluid
+           />
         </template>
       </Column>
       <Column class="text-center" field="tags" header="보험사">
         <template #body="slotProps">
           <span v-if="slotProps.data.tags && slotProps.data.tags.length > 0">
-            {{ slotProps.data.tags.map((tag: LabelValue) => tag.label).join(', ') }}
+            {{ insuranceCompanyCodes?.filter((item) => (slotProps.data.tags as string[])?.includes(item.code ?? '')).map((code) => code.name).join(', ') }}
           </span>
           <span v-else>없음</span>
         </template>
+        <template #editor="{ data, field }">
+          <MultiSelect
+            v-model="data[field]"
+            :options="insuranceCompanyCodes"
+            showClear
+            label-id="on_label"
+            option-label="name"
+            option-value="code"
+            fluid
+           />
+           </template>
       </Column>
       <Column class="text-center" field="version" header="버전"></Column>
       <Column class="text-center" field="launcherVersion" header="런처버전"></Column>

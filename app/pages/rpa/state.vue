@@ -4,6 +4,8 @@
   import type { WorkerDetail } from '~~/types/worker'
 
   const { insuranceCompanyCodes, teams } = useGlobalData()
+  const dialog = useDialog()
+
   const workDate = ref<Date>(new Date())
   const companyId = ref<string>()
   const insuranceCompanyType = ref<string>()
@@ -105,6 +107,40 @@
     page.value = 0
     execute()
   }
+
+  const onOpenWorkStateDetail = (data: any, type: WorkStateType = 'STATE') => {
+    dialog.open(resolveComponent('DialogWorkStateDetail'), {
+      data: {
+        data: data,
+        type: type,
+      },
+      props: {
+        modal: true,
+        header:
+          type === 'NOTE'
+            ? '노트 상세'
+            : type === 'DETAIL'
+              ? '작업 상세'
+              : type === 'PRIORITY'
+                ? '우선순위 변경'
+                : type === 'TIMEOUT'
+                  ? 'Timeout(ms) 변경'
+                  : `작업 상태 - ${data?.workStatePretty || '알 수 없음'}`,
+        style: {
+          width: type === 'DETAIL' ? '50vw' : '25vw',
+          textAlign: 'center',
+        },
+        breakpoints: {
+          '960px': type === 'DETAIL' ? '75vw' : '50vw',
+          '640px': type === 'DETAIL' ? '90vw' : '80vw',
+        },
+      },
+      onClose: (options) => {
+        const data = options?.data
+        if (data?.message === 'success' || data?.message === 'OK') execute()
+      },
+    })
+  }
 </script>
 <template>
   <ListDataTable
@@ -115,7 +151,10 @@
     @page="onPage"
     @sort="onSort"
     @search="execute"
-    @clearFilter="clearFilter">
+    @clearFilter="clearFilter"
+    selection-mode="single"
+    :row-class="(rowData) => (rowData.stateHistory?.length > 0 ? 'cursor-pointer' : '')"
+    @row-click="(event) => onOpenWorkStateDetail(event.data, 'DETAIL')">
     <template #filters>
       <FloatLabel variant="on">
         <DatePicker
@@ -243,9 +282,36 @@
       <Column field="contractCrawlDataModelPretty" header="파일명"></Column>
       <Column class="text-center" field="closingMonth" header="업적월"> </Column>
       <Column class="text-center" field="workerId" header="작업자"> </Column>
-      <Column class="text-right" field="priority" header="우선순위"></Column>
-      <Column class="text-center" field="workStatePretty" header="상태"></Column>
-      <Column class="text-center" field="note" header="노트"></Column>
+      <Column class="text-right" field="priority" header="우선순위">
+        <template #body="slotProps">
+          <span @click.stop="onOpenWorkStateDetail(slotProps.data, 'PRIORITY')">{{
+            slotProps.data?.priority || '0'
+          }}</span>
+        </template>
+      </Column>
+      <Column class="text-center" field="workStatePretty" header="상태">
+        <template #body="slotProps">
+          <Button
+            :severity="getColorByWorkState(slotProps.data.workState)"
+            size="small"
+            @click.stop="onOpenWorkStateDetail(slotProps.data)">
+            {{ slotProps.data.workStatePretty }}
+          </Button>
+        </template>
+      </Column>
+      <Column
+        class="overflow-hidden text-center overflow-ellipsis whitespace-nowrap"
+        style="max-width: 10rem"
+        field="note"
+        header="노트">
+        <template #body="slotProps">
+          <span
+            class="cursor-pointer"
+            @click.stop="onOpenWorkStateDetail(slotProps.data, 'NOTE')"
+            >{{ slotProps.data.note || '-' }}</span
+          >
+        </template>
+      </Column>
       <Column class="text-center" header="파일수">
         <template #body="slotProps">
           <span
@@ -275,7 +341,7 @@
       </Column>
       <Column class="text-center" header="Timeout(ms)">
         <template #body="slotProps">
-          <span
+          <span @click.stop="onOpenWorkStateDetail(slotProps.data, 'TIMEOUT')"
             >{{ convertTimeoutMsToMinutesString(slotProps.data?.lifetime || 0) }}
           </span>
         </template>
@@ -295,4 +361,5 @@
       </Column> -->
     </template>
   </ListDataTable>
+  <DynamicDialog />
 </template>

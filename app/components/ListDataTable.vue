@@ -1,5 +1,11 @@
 <script setup lang="ts">
-  import type { DataTableSortEvent } from 'primevue/datatable'
+  import type {
+    DataTableCellEditCompleteEvent,
+    DataTableEditingRows,
+    DataTableRowClickEvent,
+    DataTableRowEditSaveEvent,
+    DataTableSortEvent,
+  } from 'primevue/datatable'
   import type { PageState } from 'primevue/paginator'
 
   const {
@@ -14,6 +20,9 @@
     page: number
     size: number
     useNum?: boolean
+    editMode?: 'row' | 'cell'
+    selectionMode?: 'single' | 'multiple'
+    rowClass?: (rowData: any) => string
   }>()
   const first = ref(0)
   watch(
@@ -22,11 +31,15 @@
       first.value = newPage * size
     },
   )
+  const editingRow = defineModel<any[] | DataTableEditingRows | undefined>('editingRow')
   const emits = defineEmits<{
     (e: 'page', event: PageState): void
     (e: 'sort', sortEvent: DataTableSortEvent): void
     (e: 'search'): void
     (e: 'clearFilter'): void
+    (e: 'cellEditComplete', event: DataTableCellEditCompleteEvent<any>): void
+    (e: 'rowEditSave', event: DataTableRowEditSaveEvent<any>): void
+    (e: 'rowClick', event: DataTableRowClickEvent<any>): void
   }>()
 
   const onPage = (e: any) => {
@@ -47,30 +60,40 @@
 <template>
   <div class="flex h-full w-full flex-col gap-2 overflow-hidden">
     <div class="flex items-center justify-between gap-2">
-      <div>
+      <CustomBreadcrumb
+        :home="{ icon: 'pi pi-fw pi-home', route: '/' }"
+        :items="getMenuChainFindByMenuPath(menus, $route.path) ?? []" />
+      <!-- <div>
         <span>{{
           convertMenuChainToString(getMenuChainFindByMenuPath(menus, $route.path))
         }}</span>
-      </div>
+      </div> -->
       <slot name="header-right" />
     </div>
     <div class="min-h-0">
       <DataTable
+        v-model:editing-rows="editingRow"
         :value="data?.values ?? []"
         dataKey="id"
         scrollable
         size="small"
         scroll-height="flex"
         lazy
+        :edit-mode="editMode"
         removable-sort
         sort-mode="multiple"
         resizableColumns
         columnResizeMode="fit"
         showGridlines
         stripedRows
+        :selection-mode="selectionMode"
         :loading="status === 'pending'"
+        :row-class="rowClass"
         @page="onPage"
-        @sort="onSort">
+        @sort="onSort"
+        @cell-edit-complete="$emit('cellEditComplete', $event)"
+        @row-edit-save="$emit('rowEditSave', $event)"
+        @row-click="$emit('rowClick', $event)">
         <template #header>
           <div class="flex w-full items-start justify-between gap-2">
             <div class="min-w-[200px]">
@@ -80,11 +103,7 @@
             </div>
             <div class="flex flex-shrink-0 flex-nowrap items-center gap-2">
               <div class="flex gap-2">
-                <Button
-                  class="!px-4"
-                  label="검색"
-                  severity="primary"
-                  @click="onSearch()" />
+                <Button label="검색" severity="primary" @click="onSearch()" />
                 <Button
                   type="button"
                   icon="pi pi-filter-slash"
@@ -124,7 +143,11 @@
         </Column>
 
         <slot name="columns" />
-
+        <Column
+          v-if="editMode === 'row'"
+          :rowEditor="true"
+          style="width: 10%; min-width: 8rem"
+          bodyStyle="text-align:center"></Column>
         <template #footer>
           <div class="flex items-center justify-between">
             <span> 총 검색결과: {{ data?.pagingInfo?.totalElements ?? 0 }}건</span>

@@ -3,7 +3,8 @@
   import type { PageState } from 'primevue/paginator'
   import type { Account } from '~~/types/account'
 
-  const { insuranceCompanyCodes } = useGlobalData()
+  const { insuranceCompanyCodes, teams } = useGlobalData()
+  const dialog = useDialog()
 
   const nameLike = ref<string>('')
   const userId = ref<string>('')
@@ -54,6 +55,14 @@
     page.value = 0
     execute()
   }
+  const openAccount = (type: 'create' | 'detail') => {
+    dialog.open(resolveComponent('DialogAccount'), {
+      props: {
+        modal: true,
+        header: `계정 ${type === 'create' ? '생성' : '상세'}`,
+      },
+    })
+  }
 </script>
 <template>
   <ListDataTable
@@ -67,17 +76,25 @@
     @clear-filter="clearFilter">
     <template #header-right>
       <div class="flex items-center gap-2">
-        <Button class="!h-10 !px-4" label="계정 생성" severity="primary" raised />
+        <Button
+          class="!h-10"
+          label="계정 생성"
+          severity="primary"
+          raised
+          @click="openAccount('create')" />
       </div>
     </template>
     <template #filters>
       <FloatLabel variant="on">
-        <InputText
+        <Select
           class="w-64"
-          id="companyName"
-          v-model.trim="nameLike"
-          type="text"
-          @keypress.prevent.enter="execute()" />
+          v-model="nameLike"
+          :options="teams"
+          showClear
+          label-id="on_label"
+          option-label="name"
+          option-value="name"
+          @update:model-value="execute()" />
         <label class="dark:text-surface-0" for="on_label">회사명</label>
       </FloatLabel>
       <FloatLabel variant="on">
@@ -151,4 +168,5 @@
       </Column>
     </template>
   </ListDataTable>
+  <DynamicDialog />
 </template>

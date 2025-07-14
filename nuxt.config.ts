@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     '@primevue/nuxt-module',
     '@nuxt/eslint',
     '@vueuse/nuxt',
+    '@nuxt/image',
     // 'nuxt-security',
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
@@ -82,6 +83,13 @@ export default defineNuxtConfig({
         column: {
           columnHeaderContent: {
             class: ['justify-center']
+          }
+        },
+        inputnumber: {
+          root: {
+            style: {
+              'inset-inline-end': 'auto'
+            }
           }
         }
       },
