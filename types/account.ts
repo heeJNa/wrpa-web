@@ -1,4 +1,4 @@
-export interface Account {
+export interface AccountListItem {
     "id": string,
     "name": string,
     "userId": string,
@@ -11,4 +11,12 @@ export interface Account {
     "value": string,
     "insuranceCompanyCode": string,
     "insuranceCompanyName": string
+}
+
+export interface Account extends Omit<AccountListItem, 'companyName' | 'insuranceCompanyName' | 'value'> {
+    feePassword?: string,
+    groupId?: string,
+    paymentDayOfMonth?: number,
+    userCode?: string,
+    userPw: string,
 }

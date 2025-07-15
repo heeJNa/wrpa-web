@@ -86,6 +86,7 @@
         columnResizeMode="fit"
         showGridlines
         stripedRows
+        row-hover
         :selection-mode="selectionMode"
         :loading="status === 'pending'"
         :row-class="rowClass"

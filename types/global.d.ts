@@ -35,8 +35,6 @@ declare global {
     name?: string,
     pretty?: string
   }
-
-  type WorkStateType = 'STATE' | 'NOTE' | 'DETAIL' | 'TIMEOUT' | 'PRIORITY'
 }
 declare module '#app' {
   interface NuxtApp {

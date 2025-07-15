@@ -1,9 +1,10 @@
 <script setup lang="ts">
-  import type { DataTableSortEvent } from 'primevue/datatable'
+  import type { DataTableRowClickEvent, DataTableSortEvent } from 'primevue/datatable'
   import type { PageState } from 'primevue/paginator'
-  import type { Account } from '~~/types/account'
+  import type { Account, AccountListItem } from '~~/types/account'
 
   const { insuranceCompanyCodes, teams } = useGlobalData()
+  const { request } = useClientAPI()
   const dialog = useDialog()
 
   const nameLike = ref<string>('')
@@ -17,7 +18,7 @@
   //   companyName: { value: '', matchMode: 'contains' },
   // })
   // const getAccounts = async () => {
-  const { data, execute, status } = await useLazyAPI<ListResponse<Account>>(
+  const { data, execute, status } = await useLazyAPI<ListResponse<AccountListItem>>(
     `/api/insure/accounts`,
     {
       query: {
@@ -55,13 +56,38 @@
     page.value = 0
     execute()
   }
-  const openAccount = (type: 'create' | 'detail') => {
+  const openAccountCreate = () => {
     dialog.open(resolveComponent('DialogAccount'), {
       props: {
         modal: true,
-        header: `계정 ${type === 'create' ? '생성' : '상세'}`,
+        header: `계정 생성`,
+      },
+      onClose: (options) => {
+        const data = options?.data
+        if (data) execute()
       },
     })
+  }
+  const onRowClick = async (event: DataTableRowClickEvent<any>) => {
+    const id = event.data.id
+    if (isValidUUIDv4(id)) {
+      const { data, statusCode } = await request<Account>(`/api/insure/accounts/${id}`, {
+        method: 'GET',
+      })
+      if (statusCode.value === 200 && data.value) {
+        dialog.open(resolveComponent('DialogAccount'), {
+          data: data.value,
+          props: {
+            modal: true,
+            header: `계정 상세`,
+          },
+          onClose: (options) => {
+            const data = options?.data
+            if (data) execute()
+          },
+        })
+      }
+    }
   }
 </script>
 <template>
@@ -73,7 +99,9 @@
     @page="onPage"
     @sort="onSort"
     @search="execute"
-    @clear-filter="clearFilter">
+    @clear-filter="clearFilter"
+    :row-class="() => 'cursor-pointer'"
+    @row-click="onRowClick">
     <template #header-right>
       <div class="flex items-center gap-2">
         <Button
@@ -81,7 +109,7 @@
           label="계정 생성"
           severity="primary"
           raised
-          @click="openAccount('create')" />
+          @click="openAccountCreate" />
       </div>
     </template>
     <template #filters>
