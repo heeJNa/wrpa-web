@@ -3,6 +3,7 @@ export default defineWrappedResponseHandler(async (event) => {
     event.context.ip = getRequestIP(event, {
         xForwardedFor: true,
     })
+    console.log("rpaAuthApiUrl:", rpaAuthApiUrl)
     const token = getCookie(event, 'access_token')
     const target = new URL(event.node.req.url as string, rpaAuthApiUrl)
     return await proxyRequest(event, target.toString(), {

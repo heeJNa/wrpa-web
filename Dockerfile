@@ -22,4 +22,4 @@ WORKDIR /app
 COPY --from=build /app/.output /app/.output
 COPY ecosystem.config.cjs ./
 EXPOSE 3000
-CMD ["pm2-runtime", "ecosystem.config.cjs"]
+CMD ["pm2", "ecosystem.config.cjs", "--update-env"]
