@@ -30,7 +30,7 @@ export default defineNuxtConfig({
     },
   },
   devServer: {
-    port: 3010,
+    port: 3100,
   },
   runtimeConfig: {
     rpaApiUrl: 'http://localhost:9998',
