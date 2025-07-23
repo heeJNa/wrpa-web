@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: 'nuxt-app',
+      name: 'wrpa-web',
       script: '.output/server/index.mjs',
       cwd: '/app',
       instances: 'max',
