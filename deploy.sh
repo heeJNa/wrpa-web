@@ -1,13 +1,13 @@
 #!/bin/bash
 set -e
 
-USER="$1"
-HOST="$2"
+# USER="$1"
+# HOST="$2"
 
-if [ -z "$USER" ] || [ -z "$HOST" ]; then
-  echo "❌ Usage: $0 <USER> <HOST>"
-  exit 1
-fi
+# if [ -z "$USER" ] || [ -z "$HOST" ]; then
+#   echo "❌ Usage: $0 <USER> <HOST>"
+#   exit 1
+# fi
 
 echo "🔧 Building Docker image..."
 docker build -t wrpa-app:latest .
