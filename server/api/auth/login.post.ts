@@ -1,5 +1,4 @@
 // import CryptoJS from 'crypto-js';
-import { FetchError } from 'ofetch'
 
 export default defineWrappedResponseHandler(async (event) => {
   const { rpaAuthApiUrl } = useRuntimeConfig(event)
@@ -10,6 +9,7 @@ export default defineWrappedResponseHandler(async (event) => {
   // body.password = CryptoJS.AES.decrypt(body.password, 'secret').toString(
   //   CryptoJS.enc.Utf8,
   // ); // 임시 복호화
+  console.log("rpaAuthApiUrl:", rpaAuthApiUrl)
   const url = new URL('/api/auth/login', rpaAuthApiUrl)
 
   const data = await $fetch<any>(url.toString(), {

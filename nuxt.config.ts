@@ -33,8 +33,8 @@ export default defineNuxtConfig({
     port: 3010,
   },
   runtimeConfig: {
-    rpaApiUrl: '',
-    rpaAuthApiUrl: '',
+    rpaApiUrl: process.env.RPA_API_URL || 'http://localhost:9998',
+    rpaAuthApiUrl: process.env.RPA_AUTH_API_URL || 'http://localhost:9991',
     public: {
       appName: 'WRPA-Webb',
     }
