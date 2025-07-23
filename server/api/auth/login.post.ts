@@ -9,7 +9,6 @@ export default defineWrappedResponseHandler(async (event) => {
   // body.password = CryptoJS.AES.decrypt(body.password, 'secret').toString(
   //   CryptoJS.enc.Utf8,
   // ); // 임시 복호화
-  console.log("rpaAuthApiUrl:", rpaAuthApiUrl)
   const url = new URL('/api/auth/login', rpaAuthApiUrl)
 
   const data = await $fetch<any>(url.toString(), {
@@ -24,7 +23,7 @@ export default defineWrappedResponseHandler(async (event) => {
   if (data?.accessToken?.token) {
     setCookie(event, 'access_token', data.accessToken.token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: false, // process.env.NODE_ENV === 'production',
       maxAge: 60 * 60 * 3, // 3시간
       sameSite: 'lax',
       path: '/',

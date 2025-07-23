@@ -1,20 +1,28 @@
 #!/bin/bash
 set -e
 
-echo "1. Build Docker image locally"
-docker build -t wrpa-web:latest .
+USER="$1"
+HOST="$2"
 
-echo "2. Save image"
-docker save wrpa-web:latest | gzip > wrpa-web.tar.gz
+if [ -z "$USER" ] || [ -z "$HOST" ]; then
+  echo "❌ Usage: $0 <USER> <HOST>"
+  exit 1
+fi
 
-# echo "3. Upload and deploy to server"
-# scp wrpa-web.tar.gz "${USER}@${HOST}:~/"
+echo "🔧 Building Docker image..."
+docker build -t wrpa-app:latest .
 
-# ssh "${USER}@${HOST}" <<'EOF'
-docker load < wrpa-web.tar.gz
-rm -f wrpa-web.tar.gz || true
+echo "📦 Saving image..."
+docker save wrpa-app:latest | gzip > wrpa-app.tar.gz
+
+echo "🚀 Uploading to ${USER}@${HOST}..."
+# scp wrpa-app.tar.gz ${USER}@${HOST}:~/
+
+echo "🔄 Deploying on remote host..."
+# ssh ${USER}@${HOST} <<'EOF'
+docker load < wrpa-app.tar.gz
 docker rm -f nuxt-container || true
-docker run -d --name nuxt-container -p 3000:3000 --network=woori-net wrpa-web:latest
+docker run -d --name wrpa-app -p 80:3000 wrpa-app:latest
 # EOF
 
 echo "✅ Deployment complete!"
