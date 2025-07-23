@@ -21,8 +21,8 @@ echo "🚀 Uploading to ${USER}@${HOST}..."
 echo "🔄 Deploying on remote host..."
 # ssh ${USER}@${HOST} <<'EOF'
 docker load < wrpa-app.tar.gz
-docker rm -f nuxt-container || true
-docker run -d --name wrpa-app -p 80:3000 wrpa-app:latest
+docker rm -f wrpa-app || true
+docker run -d --name wrpa-app -p 3000:3000 --network=woori-net wrpa-app:latest
 # EOF
 
 echo "✅ Deployment complete!"
