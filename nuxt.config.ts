@@ -16,7 +16,6 @@ export default defineNuxtConfig({
   imports: {
     dirs: ['~/composables/**'],
   },
-
   devtools: { enabled: true },
   app: {
     head: {
@@ -29,6 +28,9 @@ export default defineNuxtConfig({
         { src: 'https://kit.fontawesome.com/46ad5ba21c.js', crossorigin: 'anonymous' },
       ],
     },
+  },
+  devServer: {
+    port: 3010,
   },
   runtimeConfig: {
     rpaApiUrl: '',
