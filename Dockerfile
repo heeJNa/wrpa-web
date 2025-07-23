@@ -19,7 +19,7 @@ RUN pnpm build
 FROM node:22-alpine AS runtime
 RUN corepack enable && npm install -g pm2
 WORKDIR /app
-COPY --from=build /app/.output ./
+COPY --from=build /app/.output /app/.output
 COPY ecosystem.config.cjs ./
 EXPOSE 3000
 CMD ["pm2-runtime", "ecosystem.config.cjs"]
