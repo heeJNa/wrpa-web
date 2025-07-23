@@ -14,7 +14,7 @@ docker save wrpa-web:latest | gzip > wrpa-web.tar.gz
 docker load < wrpa-web.tar.gz
 rm -f wrpa-web.tar.gz || true
 docker rm -f nuxt-container || true
-docker run -d --name nuxt-container -p 3000:3000 --network woori-net wrpa-web:latest
+docker run -d --name nuxt-container -p 3000:3000 --network=woori-net wrpa-web:latest
 # EOF
 
 echo "✅ Deployment complete!"
