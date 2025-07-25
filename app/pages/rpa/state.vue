@@ -5,6 +5,9 @@
 
   const { insuranceCompanyCodes, teams } = useGlobalData()
   const dialog = useDialog()
+  const toast = useToast()
+  const { request } = useClientAPI()
+  const confirm = useConfirm()
 
   const workDate = ref<Date>(new Date())
   const companyId = ref<string>()
@@ -133,6 +136,59 @@
         if (data?.message === 'success' || data?.message === 'OK') execute()
       },
     })
+  }
+
+  const resendWorkResult = (workId?: string) => {
+    if (!workId) {
+      toast.add({
+        severity: 'warn',
+        summary: '경고',
+        detail: '작업 ID가 없습니다.',
+      })
+    } else {
+      confirm.require({
+        message: '작업 결과를 해당 회사에 재전송하시겠습니까?',
+        header: '작업 결과 전송',
+        icon: 'pi pi-exclamation-triangle',
+        rejectProps: {
+          label: '취소',
+          severity: 'secondary',
+          outlined: true,
+        },
+        acceptProps: {
+          label: '전송',
+        },
+        accept: () => {
+          request<any>(`/api/contract-crawl/works-v2/send-result/${workId}`, {
+            method: 'POST',
+          }).then(({ data, statusCode }) => {
+            if (statusCode.value === 200) {
+              toast.add({
+                severity: 'success',
+                summary: '성공',
+                detail: '작업 결과가 성공적으로 전송되었습니다.',
+                life: 3000,
+              })
+            } else {
+              toast.add({
+                severity: 'error',
+                summary: '오류',
+                detail: `작업 결과 전송 실패: ${data.value?.message || '알 수 없는 오류'}`,
+                life: 3000,
+              })
+            }
+          })
+        },
+        // reject: () => {
+        //   toast.add({
+        //     severity: 'error',
+        //     summary: 'Rejected',
+        //     detail: 'You have rejected',
+        //     life: 3000,
+        //   })
+        // },
+      })
+    }
   }
 </script>
 <template>
@@ -328,6 +384,18 @@
       <Column class="text-center" header="소요시간">
         <template #body="slotProps">
           <span>{{ slotProps.data?.workTimePretty || '-' }} </span>
+        </template>
+      </Column>
+      <Column class="text-center" header="전송">
+        <template #body="slotProps">
+          <Button
+            class="mx-4"
+            :disabled="slotProps.data?.resultStatus !== '200'"
+            :severity="slotProps.data?.resultStatus === '200' ? '' : 'secondary'"
+            size="small"
+            @click="resendWorkResult(slotProps.data?.workId)"
+            >전송</Button
+          >
         </template>
       </Column>
 

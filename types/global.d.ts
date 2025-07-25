@@ -35,6 +35,17 @@ declare global {
     name?: string,
     pretty?: string
   }
+
+  interface MinioFile {
+    bucketName: string,
+    contentType: string,
+    objectName: string,
+  }
+  interface DefaultResponse {
+    id: string,
+    createdTime: string,
+    createdTimePretty: string,
+  }
 }
 declare module '#app' {
   interface NuxtApp {

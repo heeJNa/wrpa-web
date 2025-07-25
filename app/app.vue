@@ -4,6 +4,15 @@
     <NuxtLoadingIndicator />
     <NuxtLayout>
       <NuxtPage />
+      <ConfirmDialog>
+        <template #message="slotProps">
+          <div
+            class="border-surface-200 dark:border-surface-700 flex w-full flex-col items-center gap-4 border-b pb-4">
+            <i class="!text-4xl" :class="slotProps.message.icon"></i>
+            <p class="text-center whitespace-pre-wrap">{{ slotProps.message.message }}</p>
+          </div>
+        </template>
+      </ConfirmDialog>
     </NuxtLayout>
   </div>
 </template>
