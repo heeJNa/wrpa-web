@@ -49,18 +49,6 @@
     page.value = 0
     execute()
   }
-  const openAccountCreate = () => {
-    dialog.open(resolveComponent('DialogAccount'), {
-      props: {
-        modal: true,
-        header: `계정 생성`,
-      },
-      onClose: (options) => {
-        const data = options?.data
-        if (data) execute()
-      },
-    })
-  }
   const downloadFile = async (file: MinioFile) => {
     if (!file) return
 
@@ -136,12 +124,7 @@
     @clear-filter="clearFilter">
     <template #header-right>
       <div class="flex items-center gap-2">
-        <Button
-          class="!h-10"
-          label="파일 등록"
-          severity="primary"
-          raised
-          @click="openAccountCreate" />
+        <Button class="!h-10" label="파일 등록" severity="primary" raised />
       </div>
     </template>
     <template #filters>
@@ -188,5 +171,4 @@
       </Column>
     </template>
   </ListDataTable>
-  <DynamicDialog />
 </template>

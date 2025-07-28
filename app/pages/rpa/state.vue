@@ -408,5 +408,4 @@
       </Column> -->
     </template>
   </ListDataTable>
-  <DynamicDialog />
 </template>

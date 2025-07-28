@@ -83,6 +83,7 @@ export default defineNuxtConfig({
     options: {
       ripple: true,
       pt: {
+
         column: {
           columnHeaderContent: {
             class: ['justify-center']
