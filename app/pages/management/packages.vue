@@ -152,7 +152,7 @@
               detail: `배포가 ${publishingAction}되었습니다.`,
               life: 3000,
             })
-            packageItem.publishing = !packageItem.publishing // Toggle the publishing state
+            execute() // Toggle the publishing state
           } else {
             const errorData = await response.json()
             toast.add({
