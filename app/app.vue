@@ -32,7 +32,7 @@
   const confirmPT = {
     content: {
       class: [
-        'border-surface-200 dark:border-surface-700 flex w-full flex-col items-center gap-4 border-b pb-4',
+        'border-surface-200 dark:border-surface-700 flex w-full flex-col items-center gap-4 border-b pb-4 mb-4',
       ],
     },
     icon: {

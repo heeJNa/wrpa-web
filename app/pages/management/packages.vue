@@ -64,13 +64,14 @@
         severity: 'error',
         summary: '오류',
         detail: '파일 다운로드에 실패했습니다.',
+        life: 3000,
       })
     }
   }
   const deleteFile = (packageItem: PackageListItem) => {
     confirm.require({
       message: `정말로 "${packageItem.name}(${packageItem.version})" 파일을 삭제하시겠습니까?
-      이 작업은 되돌릴 수 없습니다.`,
+        이 작업은 되돌릴 수 없습니다.`,
       header: '패키지 파일 삭제',
       icon: 'pi pi-exclamation-triangle',
       rejectProps: {
@@ -91,6 +92,7 @@
               severity: 'success',
               summary: '성공',
               detail: '파일이 성공적으로 삭제되었습니다.',
+              life: 3000,
             })
             execute() // Refresh the list after deletion
           } else {
@@ -98,6 +100,7 @@
               severity: 'error',
               summary: '오류',
               detail: '파일 삭제에 실패했습니다.',
+              life: 3000,
             })
           }
         } catch (error) {
@@ -106,8 +109,63 @@
             severity: 'error',
             summary: '오류',
             detail: '파일 삭제에 실패했습니다.',
+            life: 3000,
           })
         }
+      },
+    })
+  }
+  const openUploadDialog = () => {
+    dialog.open(resolveComponent('DialogPackageUpload'), {
+      props: {
+        modal: true,
+        header: '패키지 파일 업로드',
+      },
+      onClose: (options) => {
+        console.log('Dialog closed with options:', options)
+        if (options?.data) execute() // Refresh the list after upload
+      },
+    })
+  }
+  const updatePublishing = (packageItem: PackageListItem) => {
+    const publishingAction = packageItem.publishing ? '중단' : '시작'
+    confirm.require({
+      message: `정말로 "${packageItem.name}(${packageItem.version})" 파일 배포를 ${publishingAction}하시겠습니까?`,
+      header: '패키지 파일 배포',
+      icon: 'pi pi-exclamation-triangle',
+      rejectProps: {
+        label: '취소',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptProps: {
+        label: publishingAction,
+      },
+      accept: () => {
+        request(`/api/packages/${packageItem.id}/publish`, {
+          method: 'POST',
+        }).onFetchResponse(async (response) => {
+          if (response.ok) {
+            toast.add({
+              severity: 'success',
+              summary: '성공',
+              detail: `배포가 ${publishingAction}되었습니다.`,
+              life: 3000,
+            })
+            packageItem.publishing = !packageItem.publishing // Toggle the publishing state
+          } else {
+            const errorData = await response.json()
+            toast.add({
+              severity: 'error',
+              summary: '오류',
+              detail:
+                errorData.message || packageItem.publishing
+                  ? '배포 중단에 실패했습니다.'
+                  : '배포 시작에 실패했습니다.',
+              life: 3000,
+            })
+          }
+        })
       },
     })
   }
@@ -124,7 +182,12 @@
     @clear-filter="clearFilter">
     <template #header-right>
       <div class="flex items-center gap-2">
-        <Button class="!h-10" label="파일 등록" severity="primary" raised />
+        <Button
+          class="!h-10"
+          label="파일 업로드"
+          severity="primary"
+          raised
+          @click="openUploadDialog" />
       </div>
     </template>
     <template #filters>
@@ -146,9 +209,11 @@
         <template #body="slotProps">
           <!-- TODO 배포 API 적용 -->
           <Badge
+            class="cursor-pointer"
             size="large"
             :value="slotProps.data.publishing ? '배포중' : '비활성'"
-            :severity="slotProps.data.publishing ? 'success' : 'danger'"></Badge>
+            :severity="slotProps.data.publishing ? 'success' : 'danger'"
+            @click="updatePublishing(slotProps.data)"></Badge>
         </template>
       </Column>
       <Column class="text-center" header="다운로드">

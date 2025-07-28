@@ -145,7 +145,7 @@
   }
 </script>
 <template>
-  <div v-if="data">
+  <div>
     <div class="p-datatable-gridlines mb-4">
       <div class="p-datatable-header">
         <div class="flex items-center justify-between">
