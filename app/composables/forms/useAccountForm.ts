@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { type Account } from '~~/types/account'
+import { v4 as uuidv4 } from 'uuid'
 
 const schema = z.object({
   feePassword: z.string().optional().nullable(),
@@ -19,7 +20,7 @@ const schema = z.object({
 })
 export const useAccountForm = () => {
   const account = ref<Account>({
-    id: crypto.randomUUID(),
+    id: uuidv4(),
     name: '',
     userId: '',
     userPhoneNumber: undefined,
@@ -34,20 +35,6 @@ export const useAccountForm = () => {
     userCode: undefined,
     userPw: '',
   })
-  // const id = ref<string>(crypto.randomUUID())
-  // const name = ref<string>('')
-  // const userId = ref<string>('')
-  // const userPhoneNumber = ref<string>()
-  // const telecomAgency = ref<string>()
-  // const note = ref<string>()
-  // const companyId = ref<string>('')
-  // const lock = ref(false)
-  // const feePassword = ref<string>()
-  // const groupId = ref<string>()
-  // const insuranceCompanyCode = ref<string>('')
-  // const paymentDayOfMonth = ref<number>()
-  // const userCode = ref<string>()
-  // const userPw = ref<string>('')
   const { errors, validate } = useFormValidator(schema, () => ({
     companyId: account.value.companyId,
     feePassword: account.value.feePassword,

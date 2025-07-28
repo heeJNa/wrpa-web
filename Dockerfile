@@ -6,13 +6,13 @@ WORKDIR /app
 # Dependencies caching
 FROM base AS deps
 COPY pnpm-lock.yaml package.json ./
-RUN pnpm fetch
+RUN pnpm fetch --frozen-lockfile
 
 # Build
 FROM base AS build
 COPY --from=deps /app /app
 COPY . .
-RUN pnpm install
+RUN pnpm install --frozen-lockfile
 RUN pnpm build
 
 # Runtime
