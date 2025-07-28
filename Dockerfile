@@ -12,7 +12,7 @@ RUN pnpm fetch --frozen-lockfile
 FROM base AS build
 COPY --from=deps /app /app
 COPY . .
-RUN pnpm install --frozen-lockfile
+RUN pnpm install
 RUN pnpm build
 
 # Runtime
