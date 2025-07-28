@@ -3,14 +3,14 @@ FROM node:22-alpine AS base
 RUN corepack enable && npm install -g pm2
 WORKDIR /app
 
-# # Dependencies caching
-# FROM base AS deps
-# COPY pnpm-lock.yaml package.json ./
-# RUN pnpm fetch
+# Dependencies caching
+FROM base AS deps
+COPY pnpm-lock.yaml package.json ./
+RUN pnpm fetch
 
 # Build
 FROM base AS build
-# COPY --from=deps /app /app
+COPY --from=deps /app /app
 COPY . .
 RUN pnpm install
 RUN pnpm build
