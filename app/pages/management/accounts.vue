@@ -2,7 +2,7 @@
   import type { DataTableRowClickEvent, DataTableSortEvent } from 'primevue/datatable'
   import type { PageState } from 'primevue/paginator'
   import type { Account, AccountListItem } from '~~/types/account'
-
+  import { DialogAccount } from '#components'
   const { insuranceCompanyCodes, teams } = useGlobalData()
   const { request } = useClientAPI()
   const dialog = useDialog()
@@ -57,14 +57,13 @@
     execute()
   }
   const openAccountCreate = () => {
-    dialog.open(resolveComponent('DialogAccount'), {
+    dialog.open(DialogAccount, {
       props: {
         modal: true,
         header: `계정 생성`,
       },
       onClose: (options) => {
-        const data = options?.data
-        if (data) execute()
+        if (options?.data) execute()
       },
     })
   }
@@ -74,7 +73,7 @@
       const { data, statusCode } = await request<Account>(`/api/insure/accounts/${id}`, {
         method: 'GET',
       })
-      if (statusCode.value === 200 && data.value) {
+      if (statusCode.value === 200) {
         dialog.open(resolveComponent('DialogAccount'), {
           data: data.value,
           props: {
