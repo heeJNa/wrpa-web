@@ -11,7 +11,7 @@ WORKDIR /app
 # Build
 FROM base AS build
 # COPY --from=deps /app /app
-# COPY . .
+COPY . .
 RUN pnpm install
 RUN pnpm build
 
