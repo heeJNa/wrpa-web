@@ -3,10 +3,10 @@ FROM node:22-alpine AS base
 RUN corepack enable && npm install -g pm2
 WORKDIR /app
 
-# Dependencies caching
-FROM base AS deps
-COPY pnpm-lock.yaml package.json ./
-RUN pnpm fetch --frozen-lockfile
+# # Dependencies caching
+# FROM base AS deps
+# COPY pnpm-lock.yaml package.json ./
+# RUN pnpm fetch
 
 # Build
 FROM base AS build
