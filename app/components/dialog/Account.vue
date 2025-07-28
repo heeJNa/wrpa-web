@@ -2,6 +2,7 @@
   import { useAccountForm } from '~/composables/forms/useAccountForm'
   import { type Account } from '~~/types/account'
 
+  console.log('Account.vue loaded')
   const { insuranceCompanyCodes, teams } = useGlobalData()
   const { request } = useClientAPI()
   const { account, errors, validate } = useAccountForm()
@@ -66,6 +67,7 @@
   }
 </script>
 <template>
+  aa
   <div class="w-full sm:w-[80vw] md:w-[50vw] lg:w-[35vw] xl:w-[25vw]">
     <form class="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2" @submit.prevent>
       <!-- 회사명 -->

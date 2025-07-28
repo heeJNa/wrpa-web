@@ -2,7 +2,7 @@
   import type { DataTableRowClickEvent, DataTableSortEvent } from 'primevue/datatable'
   import type { PageState } from 'primevue/paginator'
   import type { Account, AccountListItem } from '~~/types/account'
-  import { DialogAccount } from '#components'
+
   const { insuranceCompanyCodes, teams } = useGlobalData()
   const { request } = useClientAPI()
   const dialog = useDialog()
@@ -14,6 +14,7 @@
   const page = ref(0)
   const size = ref(25)
   const sort = ref(['createdTime,desc'])
+
   // const filters = ref({
   //   companyName: { value: '', matchMode: 'contains' },
   // })
@@ -57,7 +58,7 @@
     execute()
   }
   const openAccountCreate = () => {
-    dialog.open(DialogAccount, {
+    dialog.open(resolveComponent('DialogAccount'), {
       props: {
         modal: true,
         header: `계정 생성`,
