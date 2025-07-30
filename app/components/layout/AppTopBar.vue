@@ -22,6 +22,7 @@
     }>('/api/auth/logout', {
       method: 'POST',
     })
+    console.log('Logout status code:', statusCode.value)
     if (statusCode.value === 200) {
       await navigateTo('/login', {
         replace: true,

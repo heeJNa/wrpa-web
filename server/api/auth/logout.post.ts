@@ -2,6 +2,7 @@ import { FetchError } from 'ofetch'
 
 export default defineEventHandler(async (event) => {
   const { rpaAuthApiUrl } = useRuntimeConfig(event)
+  console.log('logout:', rpaAuthApiUrl)
   const token = getCookie(event, 'access_token')
   const url = new URL('/api/auth/logout', rpaAuthApiUrl)
   const ip = getRequestIP(event, { xForwardedFor: true })
