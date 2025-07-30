@@ -6,7 +6,7 @@
     horizontal = false,
   } = defineProps<{
     error?: string[]
-    label: string
+    label?: string
     required?: boolean
     horizontal?: boolean
   }>()
@@ -18,7 +18,7 @@
       'flex-col': !horizontal,
       'items-center gap-2': horizontal,
     }">
-    <label class="block font-semibold"
+    <label class="block font-semibold" v-if="label"
       ><span class="mr-1 text-sm text-red-500" v-if="required">*</span>{{ label }}</label
     >
     <slot name="input"></slot>

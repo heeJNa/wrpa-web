@@ -1,8 +1,8 @@
 <script setup lang="ts">
   import type { DataTableRowClickEvent, DataTableSortEvent } from 'primevue/datatable'
   import type { PageState } from 'primevue/paginator'
-  import type { Account, AccountListItem } from '~~/types/account'
-  import type { PackageListItem } from '~~/types/package'
+  import type { Account, AccountListItem } from '~/types/account'
+  import type { PackageListItem } from '~/types/package'
 
   const { request } = useClientAPI()
   const toast = useToast()
@@ -115,14 +115,13 @@
       },
     })
   }
-  const openUploadDialog = () => {
+  const handleUploadFile = () => {
     dialog.open(resolveComponent('DialogPackageUpload'), {
       props: {
         modal: true,
         header: '패키지 파일 업로드',
       },
       onClose: (options) => {
-        console.log('Dialog closed with options:', options)
         if (options?.data) execute() // Refresh the list after upload
       },
     })
@@ -172,7 +171,8 @@
 </script>
 <template>
   <ListDataTable
-    :data="data"
+    :data="data?.values"
+    :paging-info="data?.pagingInfo"
     :status="status"
     :page="page"
     :size="size"
@@ -187,7 +187,7 @@
           label="파일 업로드"
           severity="primary"
           raised
-          @click="openUploadDialog" />
+          @click="handleUploadFile" />
       </div>
     </template>
     <template #filters>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import type { DataTableRowClickEvent, DataTableSortEvent } from 'primevue/datatable'
   import type { PageState } from 'primevue/paginator'
-  import type { Account, AccountListItem } from '~~/types/account'
+  import type { Account, AccountListItem } from '~/types/account'
 
   const { insuranceCompanyCodes, teams } = useGlobalData()
   const { request } = useClientAPI()
@@ -57,7 +57,7 @@
     page.value = 0
     execute()
   }
-  const openAccountCreate = () => {
+  const handleCreateAccount = () => {
     dialog.open(resolveComponent('DialogAccount'), {
       props: {
         modal: true,
@@ -92,7 +92,8 @@
 </script>
 <template>
   <ListDataTable
-    :data="data"
+    :data="data?.values"
+    :paging-info="data?.pagingInfo"
     :status="status"
     :page="page"
     :size="size"
@@ -109,7 +110,7 @@
           label="계정 생성"
           severity="primary"
           raised
-          @click="openAccountCreate" />
+          @click="handleCreateAccount" />
       </div>
     </template>
     <template #filters>
@@ -119,6 +120,8 @@
           v-model="nameLike"
           :options="teams"
           showClear
+          filter
+          auto-filter-focus
           label-id="on_label"
           option-label="name"
           option-value="name"
@@ -140,6 +143,8 @@
           v-model="insuranceCompanyCode"
           :options="insuranceCompanyCodes"
           showClear
+          filter
+          auto-filter-focus
           label-id="on_label"
           option-label="name"
           option-value="code"

@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { useAccountForm } from '~/composables/forms/useAccountForm'
-  import { type Account } from '~~/types/account'
+  import { type Account } from '~/types/account'
 
   const { insuranceCompanyCodes, teams } = useGlobalData()
   const { request } = useClientAPI()
@@ -72,7 +72,7 @@
       <DialogForm label="회사명" :error="errors?.companyId" required>
         <template #input>
           <Select
-            id="insuranceCompanyCode"
+            id="companyId"
             v-model="account.companyId"
             :options="teams"
             showClear

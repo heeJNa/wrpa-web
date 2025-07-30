@@ -4,25 +4,6 @@ export const insuranceCompanyTypes: LabelValue[] = [
     { label: '보증보험', value: 'GUARANTEE' },
 ]
 
-export const jobTypes: LabelValue[] = [
-    {
-        value: 'NEW',
-        label: '신계약'
-    },
-    {
-        value: 'CONTRACT',
-        label: '수금'
-    },
-    {
-        value: 'COMMISSION',
-        label: '수수료'
-    },
-    {
-        value: 'MONITORING',
-        label: '모니터링'
-    }
-]
-
 export const insureTypes: LabelValue[] = [
     { label: '전체', value: 'ALL' },
     { label: '장기', value: 'LONGTERM' },

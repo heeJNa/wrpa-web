@@ -1,8 +1,14 @@
 <script setup lang="ts">
-  import type { DataTableSortEvent } from 'primevue/datatable'
+  import type { DataTableRowClickEvent, DataTableSortEvent } from 'primevue/datatable'
   import type { PageState } from 'primevue/paginator'
+  import { JobTypesEnum } from '~/types/enum'
+  import type { Job } from '~/types/job'
 
   const { insuranceCompanyCodes, teams } = useGlobalData()
+  const { request } = useClientAPI()
+  const toast = useToast()
+  const dialog = useDialog()
+  const confirm = useConfirm()
 
   const companyId = ref<string>()
   const insuranceCompanyCode = ref<string>()
@@ -16,6 +22,11 @@
   const size = ref(25)
   const sort = ref<string[]>([])
 
+  const comFilterInsuranceCompanyCodes = computed(() => {
+    return insuranceCompanyCodes.value.filter((code) => {
+      return !insuranceCompanyType.value || code.type === insuranceCompanyType.value
+    })
+  })
   const { data, execute, status } = await useLazyAPI<ListResponse<any>>(
     `/api/contract-crawl/jobs-v2`,
     {
@@ -66,20 +77,113 @@
     page.value = 0
     execute()
   }
+  const onRowClick = async (event: DataTableRowClickEvent<any>) => {
+    const id = event.data.id
+    if (isValidUUIDv4(id)) {
+      const { data, statusCode } = await request<Job>(
+        `/api/contract-crawl/jobs-v2/${id}`,
+        {
+          method: 'GET',
+        },
+      )
+      if (statusCode.value === 200) {
+        dialog.open(resolveComponent('DialogJob'), {
+          data: data.value,
+          props: {
+            modal: true,
+            header: `작업일정 상세`,
+          },
+          onClose: (options) => {
+            const data = options?.data
+            if (data) execute()
+          },
+        })
+      }
+    }
+  }
+  const onClickJobCreate = () => {
+    dialog.open(resolveComponent('DialogJob'), {
+      props: {
+        modal: true,
+        header: `작업일정 생성`,
+      },
+      onClose: (options) => {
+        if (options?.data) execute()
+      },
+    })
+  }
+
+  const createWorkManually = (job: any) => {
+    confirm.require({
+      message: `"${job.accountName}(${job.contractCrawlDataModelPretty})" 작업을 즉시 생성하시겠습니까?`,
+      header: '작업 생성',
+      icon: 'pi pi-exclamation-triangle',
+      rejectProps: {
+        label: '취소',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptProps: {
+        label: '생성',
+      },
+      accept: async () => {
+        try {
+          const { statusCode } = await request(
+            `/api/contract-crawl/jobs/${job.id}/works`,
+            {
+              method: 'POST',
+            },
+          )
+          if (statusCode.value === 200) {
+            toast.add({
+              severity: 'success',
+              summary: '성공',
+              detail: '작업이 성공적으로 생성되었습니다.',
+              life: 3000,
+            })
+            execute() // Refresh the list after creation
+          } else {
+            toast.add({
+              severity: 'error',
+              summary: '오류',
+              detail: '작업 생성에 실패했습니다.',
+              life: 3000,
+            })
+          }
+        } catch (error) {
+          console.error('작업 생성 실패:', error)
+          toast.add({
+            severity: 'error',
+            summary: '오류',
+            detail: '작업 생성에 실패했습니다.',
+            life: 3000,
+          })
+        }
+      },
+    })
+  }
 </script>
 <template>
   <ListDataTable
-    :data="data"
+    :data="data?.values"
+    :paging-info="data?.pagingInfo"
     :status="status"
     :page="page"
     :size="size"
     @page="onPage"
     @sort="onSort"
     @search="execute"
-    @clearFilter="clearFilter">
+    @clearFilter="clearFilter"
+    :row-class="() => 'cursor-pointer'"
+    @row-click="onRowClick">
     <template #header-right>
       <div class="flex items-center gap-2">
-        <Button class="!px-4" label="일정 생성" severity="primary" raised />
+        <Button
+          class="!px-4"
+          label="작업일정 생성"
+          severity="primary"
+          raised
+          @click="onClickJobCreate" />
       </div>
     </template>
     <template #filters>
@@ -89,6 +193,8 @@
           v-model="companyId"
           :options="teams"
           showClear
+          filter
+          auto-filter-focus
           label-id="on_label"
           option-label="name"
           option-value="id"
@@ -111,8 +217,10 @@
         <Select
           class="w-64"
           v-model="insuranceCompanyCode"
-          :options="insuranceCompanyCodes"
+          :options="comFilterInsuranceCompanyCodes"
           showClear
+          filter
+          auto-filter-focus
           label-id="on_label"
           option-label="name"
           option-value="code"
@@ -134,7 +242,7 @@
         <Select
           class="w-64"
           v-model="jobType"
-          :options="jobTypes"
+          :options="enumToLabelValue(JobTypesEnum)"
           showClear
           label-id="on_label"
           option-label="label"
@@ -203,18 +311,23 @@
       <Column class="text-center" field="closingMonthNum" header="업적월"> </Column>
       <Column class="text-right" field="priority" header="우선순위"> </Column>
       <Column class="text-right" field="lifetime" header="Timeout(ms)"> </Column>
-      <Column class="text-center" field="lock" header="잠김">
+      <Column class="text-center" field="locked" header="잠김">
         <template #body="slotProps">
           <Badge
             size="large"
-            :value="slotProps.data.lock ? '잠김' : '활성'"
-            :severity="slotProps.data.lock ? 'danger' : 'success'"></Badge>
+            :value="slotProps.data.locked ? '잠김' : '활성'"
+            :severity="slotProps.data.locked ? 'danger' : 'success'"></Badge>
         </template>
       </Column>
       <Column class="text-center" field="createdTime" header="생성일시"> </Column>
       <Column class="text-center" header="즉시생성">
         <template #body="slotProps">
-          <Button class="!h-7 !px-4" label="작업생성" severity="primary" raised />
+          <Button
+            class="!h-7 !px-4"
+            label="작업생성"
+            severity="primary"
+            raised
+            @click="createWorkManually(slotProps.data)" />
         </template>
       </Column>
     </template>

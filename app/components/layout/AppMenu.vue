@@ -3,7 +3,7 @@
 <template>
   <ul class="layout-menu">
     <NuxtLink class="layout-topbar-logo max-h-12" to="/">
-    <img src='/rpa-icon.png' class='w-8 h-8 mr-2'/>
+      <img class="mr-2 h-8 w-8" src="/wrpa.png" />
       <!-- <svg viewBox="0 0 54 40" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path
           fill-rule="evenodd"
@@ -29,7 +29,7 @@
         </g>
       </svg> -->
 
-      <span>WRPA</span>
+      <span class="text-xl font-bold">WRPA</span>
     </NuxtLink>
 
     <template v-for="(item, i) in menus" :key="item">

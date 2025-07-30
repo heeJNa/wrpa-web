@@ -36,7 +36,7 @@ export default defineNuxtConfig({
     rpaApiUrl: 'http://localhost:9998',
     rpaAuthApiUrl: 'http://localhost:9991',
     public: {
-      appName: 'WRPA-Webb',
+      appName: 'WRPA-Web',
     }
   },
   vite: {
@@ -82,8 +82,17 @@ export default defineNuxtConfig({
     importTheme: { from: '@/theme/app-theme.ts' },
     options: {
       ripple: true,
+      ptOptions: {
+        mergeProps: true,
+      },
       pt: {
-
+        select: {
+          listContainer: {
+            style: {
+              'max-height': '28rem',
+            },
+          },
+        },
         column: {
           columnHeaderContent: {
             class: ['justify-center']

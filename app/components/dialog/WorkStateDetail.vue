@@ -5,10 +5,9 @@
   const toast = useToast()
 
   const data = ref<any>(null)
-  onMounted(() => {
+  onBeforeMount(() => {
     data.value = dialogRef.value?.data // {user: 'primetime'}
   })
-
   const restart = () => {
     if (!data.value?.workId) {
       toast.add({
@@ -135,7 +134,6 @@
   }
   const downloadFile = (file: any) => {
     const url = `/api/system/files/${file.bucketName}/${file.fileName}`
-    console.log('Downloading file from URL:', url)
     const link = document.createElement('a')
     link.href = url
     link.download = file.fileName
@@ -145,7 +143,7 @@
   }
 </script>
 <template>
-  <div>
+  <div class="w-full md:w-[90vw] lg:w-[75vw] xl:w-[50vw]">
     <div class="p-datatable-gridlines mb-4">
       <div class="p-datatable-header">
         <div class="flex items-center justify-between">

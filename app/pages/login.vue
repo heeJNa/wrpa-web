@@ -74,8 +74,8 @@
           class="bg-surface-0 dark:bg-surface-900 w-full px-8 py-20 sm:px-20"
           style="border-radius: 53px">
           <div class="mb-8 text-center">
-            <div class="flex items-center justify-center mb-4">
-              <img src='/rpa-icon.png' class='w-16 h-16'/>
+            <div class="mb-4 flex items-center justify-center">
+              <img class="h-16 w-16" src="/wrpa.png" />
             </div>
             <!-- <svg
               class="mx-auto mb-8 w-16 shrink-0"

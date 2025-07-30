@@ -19,6 +19,7 @@ declare global {
     pagingInfo: PagingInfo
   }
   type InsuranceCompanyType = "ALL" | "LIFE" | "PROPERTY" | "GUARANTEE";
+
   interface InsuranceCompanyCode {
     code: string,
     name: string,

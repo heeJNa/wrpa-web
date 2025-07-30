@@ -1,7 +1,8 @@
 <script setup lang="ts">
   import type { DataTableSortEvent } from 'primevue/datatable'
   import type { PageState } from 'primevue/paginator'
-  import type { WorkerDetail } from '~~/types/worker'
+  import { JobTypesEnum } from '~/types/enum'
+  import type { WorkerDetail } from '~/types/worker'
 
   const { insuranceCompanyCodes, teams } = useGlobalData()
   const dialog = useDialog()
@@ -116,20 +117,12 @@
     execute()
   }
 
-  const onOpenWorkStateDetail = (data: any) => {
+  const onOpenWorkStateDetail = (_data: any) => {
     dialog.open(resolveComponent('DialogWorkStateDetail'), {
-      data,
+      data: _data,
       props: {
         modal: true,
         header: `작업 상세`,
-        style: {
-          width: '50vw',
-          textAlign: 'center',
-        },
-        breakpoints: {
-          '960px': '75vw',
-          '640px': '90vw',
-        },
       },
       onClose: (options) => {
         const data = options?.data
@@ -193,7 +186,8 @@
 </script>
 <template>
   <ListDataTable
-    :data="data"
+    :data="data?.values"
+    :paging-info="data?.pagingInfo"
     :status="status"
     :page="page"
     :size="size"
@@ -222,6 +216,8 @@
           v-model="companyId"
           :options="teams"
           showClear
+          filter
+          auto-filter-focus
           label-id="on_label"
           option-label="name"
           option-value="id"
@@ -246,6 +242,8 @@
           v-model="insuranceCompanyCode"
           :options="insuranceCompanyCodes"
           showClear
+          filter
+          auto-filter-focus
           label-id="on_label"
           option-label="name"
           option-value="code"
@@ -256,7 +254,7 @@
         <Select
           class="w-48"
           v-model="jobType"
-          :options="jobTypes"
+          :options="enumToLabelValue(JobTypesEnum)"
           showClear
           label-id="on_label"
           option-label="label"

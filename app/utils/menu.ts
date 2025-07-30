@@ -16,18 +16,16 @@ export const menus: MenuItem[] = [
     },
     {
         label: 'Management',
-        items: [{ label: '계정', icon: 'pi pi-fw pi-users', to: '/management/accounts' }, { label: '패키지', icon: 'pi pi-fw pi-box', to: '/management/packages' }],
+        items: [{ label: '팩토리', icon: 'pi pi-fw pi-book', to: '/management/factories' }, { label: '계정', icon: 'pi pi-fw pi-users', to: '/management/accounts' },
+        { label: '패키지', icon: 'pi pi-fw pi-box', to: '/management/packages' },
+        ],
     },
-    // {
-    //   label: 'Package',
-    //   items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' }],
-    // },
     {
         label: 'RPA',
-        items: [{ label: '작업PC', icon: 'pi pi-fw pi-desktop', to: '/rpa/worker' },
-        { label: '작업파일', icon: 'pi pi-fw pi-file', to: '/rpa/file' },
-        { label: '작업일정', icon: 'pi pi-fw pi-calendar-clock', to: '/rpa/schedule' },
-        { label: '작업현황', icon: 'pi pi-fw pi-list-check', to: '/rpa/state' }
+        items: [{ label: '작업PC', icon: 'pi pi-fw pi-desktop', to: '/rpa/workers' },
+        { label: '작업파일', icon: 'pi pi-fw pi-file', to: '/rpa/files' },
+        { label: '작업일정', icon: 'pi pi-fw pi-calendar-clock', to: '/rpa/jobs' },
+        { label: '작업현황', icon: 'pi pi-fw pi-list-check', to: '/rpa/states' }
         ],
     },
 ]

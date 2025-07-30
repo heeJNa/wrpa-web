@@ -10,18 +10,24 @@
 
   const {
     data,
+    pagingInfo,
+    dataKey = 'id',
     status,
     page,
     size,
     useNum = true,
+    headers = true,
   } = defineProps<{
-    data?: ListResponse<any>
+    data?: any[]
+    pagingInfo?: PagingInfo
+    dataKey?: string
     status: string
     page: number
     size: number
     useNum?: boolean
     editMode?: 'row' | 'cell'
     selectionMode?: 'single' | 'multiple'
+    headers?: boolean
     rowClass?: (rowData: any) => string
   }>()
   const first = ref(0)
@@ -73,8 +79,8 @@
     <div class="min-h-0">
       <DataTable
         v-model:editing-rows="editingRow"
-        :value="data?.values ?? []"
-        dataKey="id"
+        :value="data ?? []"
+        :dataKey="dataKey"
         scrollable
         size="small"
         scroll-height="flex"
@@ -95,7 +101,7 @@
         @cell-edit-complete="$emit('cellEditComplete', $event)"
         @row-edit-save="$emit('rowEditSave', $event)"
         @row-click="$emit('rowClick', $event)">
-        <template #header>
+        <template v-if="headers" #header>
           <div class="flex w-full items-start justify-between gap-2">
             <div class="min-w-[200px]">
               <div class="flex w-fit flex-wrap gap-2">
@@ -135,11 +141,12 @@
 
         <Column class="text-center" v-if="useNum" header="번호">
           <template #body="slotProps">
-            {{
-              data?.pagingInfo?.totalElements
-                ? data.pagingInfo.totalElements - page * size - slotProps.index
-                : ''
-            }}
+            <span v-if="pagingInfo?.totalElements">
+              {{ pagingInfo.totalElements - page * size - slotProps.index }}
+            </span>
+            <span v-else-if="data">
+              {{ data?.length - page * size - slotProps.index }}
+            </span>
           </template>
         </Column>
 
@@ -151,11 +158,13 @@
           bodyStyle="text-align:center"></Column>
         <template #footer>
           <div class="flex items-center justify-between">
-            <span> 총 검색결과: {{ data?.pagingInfo?.totalElements ?? 0 }}건</span>
+            <span>
+              총 검색결과: {{ pagingInfo?.totalElements ?? data?.length ?? 0 }}건</span
+            >
             <Paginator
               v-model:first="first"
               :rows="size"
-              :total-records="data?.pagingInfo?.totalElements ?? 0"
+              :total-records="pagingInfo?.totalElements ?? data?.length ?? 0"
               :page-link-size="5"
               :rows-per-page-options="[25, 50, 100]"
               @page="onPage" />

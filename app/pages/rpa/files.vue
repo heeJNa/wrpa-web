@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import type { DataTableSortEvent } from 'primevue/datatable'
   import type { PageState } from 'primevue/paginator'
-  import type { WorkerDetail } from '~~/types/worker'
+  import type { WorkerDetail } from '~/types/worker'
 
   const { insuranceCompanyCodes } = useGlobalData()
 
@@ -62,7 +62,8 @@
 </script>
 <template>
   <ListDataTable
-    :data="data"
+    :data="data?.values"
+    :paging-info="data?.pagingInfo"
     :status="status"
     :page="page"
     :size="size"
@@ -82,6 +83,8 @@
           v-model="insuranceCompanyCode"
           :options="insuranceCompanyCodes"
           showClear
+          filter
+          auto-filter-focus
           label-id="on_label"
           option-label="name"
           option-value="code"

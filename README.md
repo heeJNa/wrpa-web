@@ -1,4 +1,4 @@
-# WRPA
+# WRPA Web
 
 WPRA를 관리하기 위한 Admin 페이지입니다.
 

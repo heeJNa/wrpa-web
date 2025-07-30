@@ -73,3 +73,26 @@ export const errorHandler = async (nuxtApp: any, toast: any, statusCode: number,
         })
     }
 }
+
+/**
+ * Converts a TypeScript enum into an array of label-value pairs.
+ *
+ * @template T - The enum type to convert.
+ * @param {T} enumObj - The enum object to convert.
+ * @returns {LabelValue[]} An array of objects with `label` (enum key) and `value` (enum value as string).
+ *
+ * @example
+ * enum Status {
+ *   Active = 'ACTIVE',
+ *   Inactive = 'INACTIVE'
+ * }
+ * const options = enumToLabelValue(Status);
+ * // [{ label: 'ACTIVE', value: 'Active' }, { label: 'INACTIVE', value: 'Inactive' }]
+ */
+export const enumToLabelValue = <T extends Record<string, string | number>>(enumObj: T): LabelValue[] =>
+    Object.entries(enumObj)
+        .filter(([key]) => isNaN(Number(key))) // filters out reverse mapping from number enums
+        .map(([key, value]) => ({
+            label: String(value),
+            value: key,
+        }));

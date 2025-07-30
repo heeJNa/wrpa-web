@@ -1,13 +1,13 @@
 <script setup lang="ts">
   import type { DataTableRowEditSaveEvent, DataTableSortEvent } from 'primevue/datatable'
   import type { PageState } from 'primevue/paginator'
-  import type { WorkerDetail } from '~~/types/worker'
+  import type { WorkerDetail } from '~/types/worker'
 
   const { insuranceCompanyCodes } = useGlobalData()
   const { request } = useClientAPI()
-const toast = useToast()
-  const editingRows = ref([]);
-const companyName = ref<string>()
+  const toast = useToast()
+  const editingRows = ref([])
+  const companyName = ref<string>()
   const tag = ref<string>()
   const type = ref<string>()
   const page = ref(0)
@@ -53,31 +53,30 @@ const companyName = ref<string>()
     execute()
   }
 
-const onEditComplete = async (event: DataTableRowEditSaveEvent<WorkerDetail>) => {
-  if (!event.newData.owners) 
-    event.newData.owners = []
-  if (!event.newData.tags) 
-    event.newData.tags = []
-   request(`/api/workers/v2/${event.newData.id}`, {
-    method: 'PUT',
-    body: JSON.stringify(event.newData),
-   }).onFetchResponse((response) => {
-     if (response.ok) {
-      toast.add({
-        severity: 'success',
-        summary: '성공',
-        detail: '작업자 정보가 성공적으로 업데이트되었습니다.',
-        life: 3000,
-      })
-      execute()
-    }
-  })
-}
+  const onEditComplete = async (event: DataTableRowEditSaveEvent<WorkerDetail>) => {
+    if (!event.newData.owners) event.newData.owners = []
+    if (!event.newData.tags) event.newData.tags = []
+    request(`/api/workers/v2/${event.newData.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(event.newData),
+    }).onFetchResponse((response) => {
+      if (response.ok) {
+        toast.add({
+          severity: 'success',
+          summary: '성공',
+          detail: '작업자 정보가 성공적으로 업데이트되었습니다.',
+          life: 3000,
+        })
+        execute()
+      }
+    })
+  }
 </script>
 <template>
   <ListDataTable
-     v-model:editing-row='editingRows'
-    :data="data"
+    v-model:editing-row="editingRows"
+    :data="data?.values"
+    :paging-info="data?.pagingInfo"
     :status="status"
     :page="page"
     :size="size"
@@ -85,10 +84,9 @@ const onEditComplete = async (event: DataTableRowEditSaveEvent<WorkerDetail>) =>
     @sort="onSort"
     @search="execute"
     @clearFilter="clearFilter"
-    edit-mode='row'
-    @row-edit-save='onEditComplete'
-    dataKey='id'
-    >
+    edit-mode="row"
+    @row-edit-save="onEditComplete"
+    dataKey="id">
     <template #filters>
       <FloatLabel variant="on">
         <Select
@@ -96,6 +94,8 @@ const onEditComplete = async (event: DataTableRowEditSaveEvent<WorkerDetail>) =>
           v-model="companyName"
           :options="owners"
           showClear
+          filter
+          auto-filter-focus
           label-id="on_label"
           option-label="label"
           option-value="value"
@@ -108,6 +108,8 @@ const onEditComplete = async (event: DataTableRowEditSaveEvent<WorkerDetail>) =>
           v-model="tag"
           :options="insuranceCompanyCodes"
           showClear
+          filter
+          auto-filter-focus
           label-id="on_label"
           option-label="name"
           option-value="code"
@@ -140,7 +142,14 @@ const onEditComplete = async (event: DataTableRowEditSaveEvent<WorkerDetail>) =>
       <Column class="text-center" field="owners" header="소유자">
         <template #body="slotProps">
           <span v-if="slotProps.data.owners && slotProps.data.owners.length > 0">
-            {{ owners?.filter((owner) => (slotProps.data.owners as string[])?.includes(owner.value ?? '')).map((owner) => owner.label).join(', ') }}
+            {{
+              owners
+                ?.filter((owner) =>
+                  (slotProps.data.owners as string[])?.includes(owner.value ?? ''),
+                )
+                .map((owner) => owner.label)
+                .join(', ')
+            }}
           </span>
           <span v-else>없음</span>
         </template>
@@ -152,14 +161,20 @@ const onEditComplete = async (event: DataTableRowEditSaveEvent<WorkerDetail>) =>
             label-id="on_label"
             option-label="label"
             option-value="value"
-            fluid
-           />
+            fluid />
         </template>
       </Column>
       <Column class="text-center" field="tags" header="보험사">
         <template #body="slotProps">
           <span v-if="slotProps.data.tags && slotProps.data.tags.length > 0">
-            {{ insuranceCompanyCodes?.filter((item) => (slotProps.data.tags as string[])?.includes(item.code ?? '')).map((code) => code.name).join(', ') }}
+            {{
+              insuranceCompanyCodes
+                ?.filter((item) =>
+                  (slotProps.data.tags as string[])?.includes(item.code ?? ''),
+                )
+                .map((code) => code.name)
+                .join(', ')
+            }}
           </span>
           <span v-else>없음</span>
         </template>
@@ -171,9 +186,8 @@ const onEditComplete = async (event: DataTableRowEditSaveEvent<WorkerDetail>) =>
             label-id="on_label"
             option-label="name"
             option-value="code"
-            fluid
-           />
-           </template>
+            fluid />
+        </template>
       </Column>
       <Column class="text-center" field="version" header="버전"></Column>
       <Column class="text-center" field="launcherVersion" header="런처버전"></Column>
