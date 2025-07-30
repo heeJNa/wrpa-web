@@ -2,7 +2,6 @@ import { FetchError } from 'ofetch'
 
 export default defineEventHandler(async (event) => {
   const { rpaAuthApiUrl } = useRuntimeConfig(event)
-  console.log('logout:', rpaAuthApiUrl)
   const token = getCookie(event, 'access_token')
   const url = new URL('/api/auth/logout', rpaAuthApiUrl)
   const ip = getRequestIP(event, { xForwardedFor: true })
@@ -57,7 +56,7 @@ export default defineEventHandler(async (event) => {
     // 쿠키는 무조건 제거
     setCookie(event, 'access_token', '', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: false, //process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       expires: new Date(0),
     })

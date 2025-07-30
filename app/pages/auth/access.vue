@@ -29,18 +29,18 @@
             </div>
             <h1
               class="text-surface-900 dark:text-surface-0 mb-2 text-4xl font-bold lg:text-5xl">
-              Access Denied
+              접근이 거부되었습니다
             </h1>
             <span class="text-muted-color mb-8"
-              >You do not have the necessary permisions. Please contact admins.</span
+              >필요한 권한이 없습니다. 관리자에게 문의하십시오.</span
             >
             <img
               class="mb-8"
               src="/auth/asset-access.svg"
-              alt="Access denied"
+              alt="Access Denied"
               width="80%" />
             <div class="col-span-12 mt-8 text-center">
-              <Button as="router-link" label="Go to Dashboard" to="/" severity="warn" />
+              <Button as="router-link" label="대시보드로 이동" to="/" severity="warn" />
             </div>
           </div>
         </div>

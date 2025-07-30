@@ -2,7 +2,6 @@
 
 export default defineWrappedResponseHandler(async (event) => {
   const { rpaAuthApiUrl } = useRuntimeConfig(event)
-  console.log('login: ', rpaAuthApiUrl)
   const body = await readBody<any>(event)
   // const ip = getRequestIP(event, {
   //   xForwardedFor: true,

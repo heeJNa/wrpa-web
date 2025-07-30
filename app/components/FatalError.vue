@@ -24,14 +24,12 @@
               <i class="pi pi-fw pi-exclamation-circle !text-2xl text-pink-500" />
             </div>
             <h1 class="text-surface-900 dark:text-surface-0 mb-2 text-5xl font-bold">
-              Error Occured
+              오류가 발생했습니다
             </h1>
-            <span class="text-muted-color mb-8"
-              >Requested resource is not available.</span
-            >
+            <span class="text-muted-color mb-8">요청한 리소스를 사용할 수 없습니다.</span>
             <img class="mb-8" src="/general/asset-error.svg" alt="Error" width="80%" />
             <div class="col-span-12 mt-8 text-center">
-              <Button as="router-link" label="Go to Dashboard" to="/" severity="danger" />
+              <Button as="router-link" label="대시보드로 이동" to="/" severity="danger" />
             </div>
           </div>
         </div>
