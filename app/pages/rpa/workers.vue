@@ -6,7 +6,10 @@
   const { insuranceCompanyCodes } = useGlobalData()
   const { request } = useClientAPI()
   const toast = useToast()
+  const confirm = useConfirm()
+
   const editingRows = ref([])
+  const selection = ref<any>()
   const companyName = ref<string>()
   const tag = ref<string>()
   const type = ref<string>()
@@ -71,9 +74,43 @@
       }
     })
   }
+  const onDelete = async () => {
+    confirm.require({
+      message: `선택한 ${selection.value.length}개의 작업자를 정말로 삭제하시겠습니까?
+        이 작업은 되돌릴 수 없습니다.`,
+      header: '작업자 삭제',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: '삭제',
+      rejectProps: {
+        label: '취소',
+        severity: 'secondary',
+        outlined: true,
+      },
+      accept: async () => {
+        const requests = selection.value.map((item: WorkerDetail) => {
+          return request(`/api/workers/v2/${item.id}`, {
+            method: 'DELETE',
+          }).onFetchResponse((response) => {
+            if (response.ok) {
+              toast.add({
+                severity: 'success',
+                summary: '성공',
+                detail: `${item.name}가 성공적으로 삭제되었습니다.`,
+                life: 3000,
+              })
+            }
+          })
+        })
+        await Promise.all(requests)
+        selection.value = []
+        execute()
+      },
+    })
+  }
 </script>
 <template>
   <ListDataTable
+    v-model:selection="selection"
     v-model:editing-row="editingRows"
     :data="data?.values"
     :paging-info="data?.pagingInfo"
@@ -86,6 +123,7 @@
     @clearFilter="clearFilter"
     edit-mode="row"
     @row-edit-save="onEditComplete"
+    select-checkbox
     dataKey="id">
     <template #filters>
       <FloatLabel variant="on">
@@ -128,6 +166,15 @@
           @update:model-value="execute()" />
         <label class="dark:text-surface-0" for="on_label">종류</label>
       </FloatLabel>
+    </template>
+    <template #buttons>
+      <Button
+        label="삭제"
+        icon="pi pi-trash"
+        severity="danger"
+        variant="outlined"
+        :disabled="!selection?.length"
+        @click="onDelete" />
     </template>
     <template #columns>
       <Column

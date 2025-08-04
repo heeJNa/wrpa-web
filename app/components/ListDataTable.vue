@@ -28,6 +28,7 @@
     editMode?: 'row' | 'cell'
     selectionMode?: 'single' | 'multiple'
     headers?: boolean
+    selectCheckbox?: boolean
     rowClass?: (rowData: any) => string
   }>()
   const first = ref(0)
@@ -38,6 +39,7 @@
     },
   )
   const editingRow = defineModel<any[] | DataTableEditingRows | undefined>('editingRow')
+  const selection = defineModel<any | undefined>('selection')
   const emits = defineEmits<{
     (e: 'page', event: PageState): void
     (e: 'sort', sortEvent: DataTableSortEvent): void
@@ -78,6 +80,7 @@
     </div>
     <div class="min-h-0">
       <DataTable
+        v-model:selection="selection"
         v-model:editing-rows="editingRow"
         :value="data ?? []"
         :dataKey="dataKey"
@@ -93,7 +96,7 @@
         showGridlines
         stripedRows
         row-hover
-        :selection-mode="selectionMode"
+        :selection-mode="!selectCheckbox ? selectionMode : undefined"
         :loading="status === 'pending'"
         :row-class="rowClass"
         @page="onPage"
@@ -117,6 +120,7 @@
                   label="초기화"
                   outlined
                   @click="onClearFilter()" />
+                <slot name="buttons" />
               </div>
             </div>
           </div>
@@ -138,7 +142,11 @@
             </template>
           </Toolbar>
         </template>
-
+        <Column
+          v-if="selectCheckbox"
+          :selectionMode="selectionMode ?? 'multiple'"
+          headerStyle="width: 3rem;"
+          style="text-align: center"></Column>
         <Column class="text-center" v-if="useNum" header="번호">
           <template #body="slotProps">
             <span v-if="pagingInfo?.totalElements">
@@ -155,7 +163,8 @@
           v-if="editMode === 'row'"
           :rowEditor="true"
           style="width: 10%; min-width: 8rem"
-          bodyStyle="text-align:center"></Column>
+          bodyStyle="text-align:center">
+        </Column>
         <template #footer>
           <div class="flex items-center justify-between">
             <span>

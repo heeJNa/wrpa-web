@@ -15,7 +15,7 @@
   const insuranceCompanyType = ref<string>()
   const insuranceCompanyCode = ref<string>()
   const jobType = ref<string>()
-  const closingMonth = ref<Date>(new Date())
+  const closingMonth = ref<Date>()
   const workState = ref<string>()
   const resultStatus = ref<string>()
   const createType = ref<string>()
@@ -28,7 +28,11 @@
     return formatToKoreanTime(workDate.value, 'YYYY-MM-DD')
   })
   const refineClosingMonth = computed(() => {
+    if (!closingMonth.value) return null
     return formatToKoreanTime(closingMonth.value, 'YYYY-MM')
+  })
+  watch(refineClosingMonth, () => {
+    execute()
   })
   const { data: workStates } = await useLazyAPI<{ code: string; name: string }[]>(
     '/api/basic/work-states',
@@ -82,9 +86,11 @@
       resultStatus: resultStatus,
       createType: createType,
     },
+    immediate: false,
   })
 
-  watch(data, () => {
+  watch(data, (newVal) => {
+    console.log('Data updated:', newVal)
     executeSummary()
   })
 
@@ -270,9 +276,7 @@
           dateFormat="yy-mm"
           label-id="on_label"
           show-icon
-          :manual-input="false"
-          show-button-bar
-          @update:model-value="execute()" />
+          show-button-bar />
         <label class="dark:text-surface-0" for="on_label">업적월</label>
       </FloatLabel>
       <FloatLabel variant="on">

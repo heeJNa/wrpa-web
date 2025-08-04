@@ -27,3 +27,6 @@ logs
 # Jetbrains
 .idea
 
+# Zip
+*.zip
+*.tar.gz
