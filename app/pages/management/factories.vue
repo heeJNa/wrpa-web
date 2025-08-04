@@ -5,7 +5,7 @@
   const dialog = useDialog()
 
   const page = ref(0)
-  const size = ref(25)
+  const size = ref(100)
 
   const { data, execute, status } = await useLazyAPI<Factory[]>(
     `/api/contract-crawl/factories`,

@@ -12,7 +12,7 @@
   const insuranceCompanyCode = ref<string>()
   const lock = ref<boolean>()
   const page = ref(0)
-  const size = ref(25)
+  const size = ref(100)
   const sort = ref(['createdTime,desc'])
 
   // const filters = ref({

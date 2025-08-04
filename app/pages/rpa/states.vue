@@ -21,7 +21,7 @@
   const createType = ref<string>()
   const workerId = ref<string>()
   const page = ref(0)
-  const size = ref(25)
+  const size = ref(100)
   const sort = ref<string[]>([])
 
   const refineWorkDate = computed(() => {
@@ -89,8 +89,7 @@
     immediate: false,
   })
 
-  watch(data, (newVal) => {
-    console.log('Data updated:', newVal)
+  watch(data, () => {
     executeSummary()
   })
 
@@ -410,4 +409,5 @@
       </Column> -->
     </template>
   </ListDataTable>
+  <ConfirmDialog :pt="confirmPT" />
 </template>

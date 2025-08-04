@@ -1,3 +1,17 @@
+export const confirmPT = {
+    content: {
+        class: [
+            'border-surface-200 dark:border-surface-700 flex w-full flex-col items-center gap-4 border-b pb-4 mb-4',
+        ],
+    },
+    icon: {
+        class: ['!text-4xl'],
+    },
+    message: {
+        class: ['text-center whitespace-pre-wrap'],
+    },
+}
+
 export const insuranceCompanyTypes: LabelValue[] = [
     { label: '생명보험', value: 'LIFE' },
     { label: '손해보험', value: 'PROPERTY' },

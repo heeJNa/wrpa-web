@@ -1,10 +1,12 @@
 <script setup lang="ts">
   import type { DataTableRowClickEvent, DataTableSortEvent } from 'primevue/datatable'
   import type { PageState } from 'primevue/paginator'
+  import { useJobForm } from '~/composables/forms/useJobForm'
   import { JobTypesEnum } from '~/types/enum'
   import type { Job } from '~/types/job'
 
   const { insuranceCompanyCodes, teams } = useGlobalData()
+  const { manualJobForm, manualErrors, manualValidate } = useJobForm()
   const { request } = useClientAPI()
   const toast = useToast()
   const dialog = useDialog()
@@ -19,7 +21,7 @@
   const lastClosingMonthNum = ref<number>(0) // For tracking last closing month
   const locked = ref<boolean>()
   const page = ref(0)
-  const size = ref(25)
+  const size = ref(100)
   const sort = ref<string[]>([])
 
   const comFilterInsuranceCompanyCodes = computed(() => {
@@ -115,7 +117,8 @@
 
   const createWorkManually = (job: any) => {
     confirm.require({
-      message: `"${job.accountName}(${job.contractCrawlDataModelPretty})" 작업을 즉시 생성하시겠습니까?`,
+      message: `"${job.accountName}(${job.contractCrawlDataModelPretty})" 작업을 
+      즉시 생성하시겠습니까?`,
       header: '작업 생성',
       icon: 'pi pi-exclamation-triangle',
       rejectProps: {
@@ -126,12 +129,20 @@
       acceptProps: {
         label: '생성',
       },
+      onHide() {
+        manualJobForm.value.closingMonthNum = 0
+        manualJobForm.value.priority = 100
+      },
       accept: async () => {
+        if (!manualValidate()) return
         try {
           const { statusCode } = await request(
-            `/api/contract-crawl/jobs/${job.id}/works`,
+            `/api/contract-crawl/jobs/${job.id}/works-v2`,
             {
               method: 'POST',
+              body: JSON.stringify({
+                ...manualJobForm.value,
+              }),
             },
           )
           if (statusCode.value === 200) {
@@ -141,7 +152,6 @@
               detail: '작업이 성공적으로 생성되었습니다.',
               life: 3000,
             })
-            execute() // Refresh the list after creation
           } else {
             toast.add({
               severity: 'error',
@@ -332,4 +342,35 @@
       </Column>
     </template>
   </ListDataTable>
+  <ConfirmDialog :pt="confirmPT">
+    <template #message="slotProps">
+      <p class="text-center whitespace-pre-wrap">{{ slotProps.message.message }}</p>
+      <div class="flex w-full justify-around gap-2">
+        <DialogForm label="업적월" required :error="manualErrors.closingMonthNum">
+          <template #input>
+            <InputNumber
+              id="manualClosingMonthNum"
+              v-model="manualJobForm.closingMonthNum"
+              fluid
+              :min="-12"
+              :max="12"
+              :invalid="!!manualErrors.closingMonthNum"
+              autocomplete="off" />
+          </template>
+        </DialogForm>
+        <DialogForm label="우선순위" required :error="manualErrors.priority">
+          <template #input>
+            <InputNumber
+              id="manualPriority"
+              v-model="manualJobForm.priority"
+              fluid
+              :invalid="!!manualErrors.priority"
+              :min="0"
+              :max="999"
+              autocomplete="off" />
+          </template>
+        </DialogForm>
+      </div>
+    </template>
+  </ConfirmDialog>
 </template>

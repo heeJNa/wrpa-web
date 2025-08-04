@@ -14,7 +14,7 @@
   const tag = ref<string>()
   const type = ref<string>()
   const page = ref(0)
-  const size = ref(25)
+  const size = ref(100)
   const sort = ref<string[]>(['name,desc'])
   const { data: owners } = await useLazyAPI<LabelValue[]>(`/api/workers/owners`)
   const { data: types } =
@@ -244,4 +244,5 @@
         header="마지막 연결 시간"></Column>
     </template>
   </ListDataTable>
+  <ConfirmDialog :pt="confirmPT"> </ConfirmDialog>
 </template>

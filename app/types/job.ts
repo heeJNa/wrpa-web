@@ -42,4 +42,10 @@ interface Job extends JobForm {
     insuranceCompanyCode?: string;
 }
 
-export { jobSchema, type Job, type JobForm, type JobTypes }
+const manualJobSchema = z.object({
+    priority: z.number('우선순위를 입력해주세요').int().min(0, '우선순위는 0 이상이어야 합니다'),
+    closingMonthNum: z.number('업적월을 입력해주세요').int(),
+});
+type ManualJobForm = z.infer<typeof manualJobSchema>
+
+export { jobSchema, type Job, type JobForm, type JobTypes, manualJobSchema, type ManualJobForm }

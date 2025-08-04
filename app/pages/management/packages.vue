@@ -11,7 +11,7 @@
 
   const nameLike = ref<string>('')
   const page = ref(0)
-  const size = ref(25)
+  const size = ref(100)
   const sort = ref(['createdTime,desc'])
   // const filters = ref({
   //   companyName: { value: '', matchMode: 'contains' },
@@ -236,4 +236,5 @@
       </Column>
     </template>
   </ListDataTable>
+  <ConfirmDialog :pt="confirmPT" />
 </template>

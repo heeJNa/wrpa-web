@@ -10,7 +10,7 @@
   const fileType = ref<string>()
   const insureType = ref<string>()
   const page = ref(0)
-  const size = ref(25)
+  const size = ref(100)
   const sort = ref<string[]>([])
   const { data: dataTypes } = await useLazyAPI<EnumPretty[]>(
     '/api/contract-crawl-data/data-types',
