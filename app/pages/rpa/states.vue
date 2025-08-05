@@ -85,6 +85,7 @@
       workState: workState,
       resultStatus: resultStatus,
       createType: createType,
+      includedScheduled: 'Y',
     },
     immediate: false,
   })
