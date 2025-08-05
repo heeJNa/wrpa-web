@@ -3,7 +3,7 @@
   import type { PageState } from 'primevue/paginator'
   import { useJobForm } from '~/composables/forms/useJobForm'
   import { JobTypesEnum } from '~/types/enum'
-  import type { Job } from '~/types/job'
+  import type { Job, JobBatchUpdatePayload } from '~/types/job'
 
   const { insuranceCompanyCodes, teams } = useGlobalData()
   const { manualJobForm, manualErrors, manualValidate } = useJobForm()
@@ -11,6 +11,8 @@
   const toast = useToast()
   const dialog = useDialog()
   const confirm = useConfirm()
+
+  const selection = ref<any[]>([])
 
   const companyId = ref<string>()
   const insuranceCompanyCode = ref<string>()
@@ -24,6 +26,16 @@
   const size = ref(100)
   const sort = ref<string[]>([])
 
+  const batchUpdatePayload = ref<JobBatchUpdatePayload>({
+    ids: [],
+    startDate: undefined,
+    endDate: undefined,
+    workTime: undefined,
+    priority: undefined,
+    closingMonthNum: undefined,
+    timeout: undefined,
+    locked: false,
+  })
   const comFilterInsuranceCompanyCodes = computed(() => {
     return insuranceCompanyCodes.value.filter((code) => {
       return !insuranceCompanyType.value || code.type === insuranceCompanyType.value
@@ -172,14 +184,72 @@
       },
     })
   }
+  const onBatchUpdate = async () => {
+    if (selection.value.length === 0) {
+      toast.add({
+        severity: 'warn',
+        summary: '경고',
+        detail: '수정할 작업을 선택해주세요.',
+        life: 3000,
+      })
+      return
+    }
+    batchUpdatePayload.value.ids = selection.value.map((job) => job.id)
+    try {
+      const { statusCode } = await request(`/api/contract-crawl/jobs/batch/update-v2`, {
+        method: 'PUT',
+        body: JSON.stringify(batchUpdatePayload.value),
+      })
+      if (statusCode.value === 200) {
+        toast.add({
+          severity: 'success',
+          summary: '성공',
+          detail: '일괄 수정이 완료되었습니다.',
+          life: 3000,
+        })
+        batchUpdatePayload.value.ids = []
+        selection.value = []
+        execute()
+      } else {
+        toast.add({
+          severity: 'error',
+          summary: '오류',
+          detail: '일괄 수정에 실패했습니다.',
+          life: 3000,
+        })
+      }
+    } catch (error) {
+      console.error('일괄 수정 실패:', error)
+      toast.add({
+        severity: 'error',
+        summary: '오류',
+        detail: '일괄 수정에 실패했습니다.',
+        life: 3000,
+      })
+    }
+  }
+  const clearBatchUpdatePayload = () => {
+    batchUpdatePayload.value = {
+      ids: [],
+      startDate: undefined,
+      endDate: undefined,
+      workTime: undefined,
+      priority: undefined,
+      closingMonthNum: undefined,
+      timeout: undefined,
+    }
+  }
 </script>
 <template>
   <ListDataTable
+    v-model:selection="selection"
     :data="data?.values"
     :paging-info="data?.pagingInfo"
     :status="status"
     :page="page"
     :size="size"
+    selectCheckbox
+    selectionMode="multiple"
     @page="onPage"
     @sort="onSort"
     @search="execute"
@@ -290,11 +360,87 @@
         <label class="dark:text-surface-0" for="on_label">잠김 상태</label>
       </FloatLabel>
     </template>
-    <!-- <template #toolbar-end>
-      <div class="flex items-center gap-2">
-        <Button class="!h-10 !px-4" label="계정 생성" severity="primary" raised />
+    <template #toolbar-start>
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-lg font-semibold">일괄 수정</span>
+        <FloatLabel variant="on">
+          <InputText
+            class="w-48"
+            v-model="batchUpdatePayload.startDate"
+            label-id="on_label"
+            fluid>
+          </InputText>
+          <label class="dark:text-surface-0" for="on_label">시작일</label>
+        </FloatLabel>
+        <FloatLabel variant="on">
+          <InputText
+            class="w-48"
+            v-model="batchUpdatePayload.endDate"
+            label-id="on_label"
+            fluid>
+          </InputText>
+          <label class="dark:text-surface-0" for="on_label">종료일</label>
+        </FloatLabel>
+        <FloatLabel variant="on">
+          <InputText
+            class="w-48"
+            v-model="batchUpdatePayload.workTime"
+            label-id="on_label"
+            fluid>
+          </InputText>
+          <label class="dark:text-surface-0" for="on_label">시간</label>
+        </FloatLabel>
+        <FloatLabel variant="on">
+          <InputNumber
+            class="w-48"
+            v-model="batchUpdatePayload.closingMonthNum"
+            :min="-12"
+            :max="12"
+            show-buttons
+            label-id="on_label"
+            fluid>
+          </InputNumber>
+          <label class="dark:text-surface-0" for="on_label">업적월</label>
+        </FloatLabel>
+        <FloatLabel variant="on">
+          <InputNumber
+            class="w-48"
+            v-model="batchUpdatePayload.priority"
+            label-id="on_label"
+            fluid>
+          </InputNumber>
+          <label class="dark:text-surface-0" for="on_label">우선순위</label>
+        </FloatLabel>
+        <FloatLabel variant="on">
+          <InputNumber
+            class="w-48"
+            v-model="batchUpdatePayload.timeout"
+            label-id="on_label"
+            fluid>
+          </InputNumber>
+          <label class="dark:text-surface-0" for="on_label">Timeout(ms)</label>
+        </FloatLabel>
+        <Checkbox v-model="batchUpdatePayload.locked" inputId="locked" />
+        <label for="locked"> 잠금 </label>
       </div>
-    </template> -->
+    </template>
+    <template #toolbar-end>
+      <div class="flex items-center gap-2">
+        <Button
+          type="button"
+          label="일괄 수정"
+          severity="primary"
+          raised
+          @click="onBatchUpdate" />
+        <Button
+          type="button"
+          icon="pi pi-filter-slash"
+          label="초기화"
+          outlined
+          @click="clearBatchUpdatePayload" />
+        <slot name="buttons" />
+      </div>
+    </template>
     <template #columns>
       <Column
         class="text-center"

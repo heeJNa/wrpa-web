@@ -48,4 +48,14 @@ const manualJobSchema = z.object({
 });
 type ManualJobForm = z.infer<typeof manualJobSchema>
 
-export { jobSchema, type Job, type JobForm, type JobTypes, manualJobSchema, type ManualJobForm }
+interface JobBatchUpdatePayload {
+    ids: string[];
+    startDate?: string;
+    endDate?: string;
+    workTime?: string;
+    priority?: number;
+    closingMonthNum?: number;
+    timeout?: number;
+    locked?: boolean;
+}
+export { jobSchema, type Job, type JobForm, type JobTypes, manualJobSchema, type ManualJobForm, type JobBatchUpdatePayload }

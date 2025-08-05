@@ -128,7 +128,7 @@
             class="my-2 !border-0 !bg-transparent !p-0 !shadow-none"
             v-if="
               $slots?.['toolbar-start'] ||
-              $slots?.['oolbar-center'] ||
+              $slots?.['toolbar-center'] ||
               $slots?.['toolbar-end']
             ">
             <template #start>
