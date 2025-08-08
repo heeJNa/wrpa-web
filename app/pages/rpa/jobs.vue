@@ -128,6 +128,8 @@
   }
 
   const createWorkManually = (job: any) => {
+    manualJobForm.value.closingMonthNum = job.closingMonthNum || 0
+    manualJobForm.value.priority = job.priority || 100
     confirm.require({
       message: `"${job.accountName}(${job.contractCrawlDataModelPretty})" 작업을 
       즉시 생성하시겠습니까?`,
@@ -420,7 +422,7 @@
           </InputNumber>
           <label class="dark:text-surface-0" for="on_label">Timeout(ms)</label>
         </FloatLabel>
-        <Checkbox v-model="batchUpdatePayload.locked" inputId="locked" />
+        <Checkbox v-model="batchUpdatePayload.locked" inputId="locked" binary />
         <label for="locked"> 잠금 </label>
       </div>
     </template>

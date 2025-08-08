@@ -6,7 +6,7 @@ export default defineNuxtRouteMiddleware((to) => {
   }
   // 로그인 페이지는 예외 처리
   if (tokenState.value && to.path.toLowerCase() === '/login') {
-    return abortNavigation()
+    return navigateTo('/')
   }
   if (!tokenState.value) {
     if (to.path === '/login') return
