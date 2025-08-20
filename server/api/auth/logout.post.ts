@@ -1,9 +1,9 @@
 import { FetchError } from 'ofetch'
 
 export default defineEventHandler(async (event) => {
-  const { rpaAuthApiUrl } = useRuntimeConfig(event)
+  const { rpaApiUrl } = useRuntimeConfig(event)
   const token = getCookie(event, 'access_token')
-  const url = new URL('/api/auth/logout', rpaAuthApiUrl)
+  const url = new URL('/api/auth/logout', rpaApiUrl)
   const ip = getRequestIP(event, { xForwardedFor: true })
   const headers: [string, string][] = [['Content-Type', 'application/json']]
   const timestamp = new Date().toLocaleString('ko-KR', {
@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     if (!token) throw new Error('No token')
     console.log('[로그아웃 요청]', {
       timestamp,
-      url: url.toString().replace(rpaAuthApiUrl, ''),
+      url: url.toString().replace(rpaApiUrl, ''),
       userAgent,
       ip,
     })

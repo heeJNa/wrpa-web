@@ -1,7 +1,7 @@
 // import CryptoJS from 'crypto-js';
 
 export default defineWrappedResponseHandler(async (event) => {
-  const { rpaAuthApiUrl } = useRuntimeConfig(event)
+  const { rpaApiUrl } = useRuntimeConfig(event)
   const body = await readBody<any>(event)
   // const ip = getRequestIP(event, {
   //   xForwardedFor: true,
@@ -9,14 +9,14 @@ export default defineWrappedResponseHandler(async (event) => {
   // body.password = CryptoJS.AES.decrypt(body.password, 'secret').toString(
   //   CryptoJS.enc.Utf8,
   // ); // 임시 복호화
-  const url = new URL('/api/auth/login', rpaAuthApiUrl)
+  const url = new URL('/api/auth/sign-in', rpaApiUrl)
 
   const data = await $fetch<any>(url.toString(), {
     body: {
-      providerKey: body.providerKey,
-      authInfo: body.authInfo,
-      providerId: body.providerId,
-      deviceInfo: body.deviceInfo,
+      username: body.username,
+      password: body.password,
+      // providerId: body.providerId,
+      // deviceInfo: body.deviceInfo,
     },
     method: 'POST',
   })

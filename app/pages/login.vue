@@ -22,14 +22,14 @@
       const data = await $fetch<any>('/api/auth/login', {
         method: 'POST',
         body: JSON.stringify({
-          providerKey: id.value,
-          authInfo: password.value,
-          providerId: 'credential',
-          deviceInfo: {
-            os: os.value,
-            token: '',
-            appName: appName,
-          },
+          username: id.value,
+          password: password.value,
+          // providerId: 'credential',
+          // deviceInfo: {
+          //   os: os.value,
+          //   token: '',
+          //   appName: appName,
+          // },
         }),
         credentials: 'include',
       })
