@@ -162,6 +162,7 @@
             id="userPhoneNumber"
             v-model="account.userPhoneNumber"
             mask="999-9999-9999"
+            unmask
             autocomplete="off" />
         </template>
       </DialogForm>
