@@ -12,3 +12,10 @@ export enum JobTypesStateEnum {
     UNAVAILABLE = "사용불가",
     WORKING = "작업중",
 }
+
+export enum InsureTypesEnum {
+    "ALL" = "전체",
+    "LONGTERM" = "장기",
+    "CAR" = "자동차",
+    "GENERAL" = "일반",
+}

@@ -1,9 +1,11 @@
 <script setup lang="ts">
-  import type { DataTableSortEvent } from 'primevue/datatable'
+  import type { DataTableRowClickEvent, DataTableSortEvent } from 'primevue/datatable'
   import type { PageState } from 'primevue/paginator'
   import type { WorkerDetail } from '~/types/worker'
 
   const { insuranceCompanyCodes } = useGlobalData()
+  const { request } = useClientAPI()
+  const dialog = useDialog()
 
   const insuranceCompanyCode = ref<string>()
   const dataType = ref<string>()
@@ -59,6 +61,54 @@
     page.value = 0
     execute()
   }
+
+  const onClickFileCreate = () => {
+    dialog.open(resolveComponent('DialogFile'), {
+      data: {
+        dataTypes,
+        fileTypes,
+        insureTypes,
+      },
+      props: {
+        modal: true,
+        header: `작업파일 생성`,
+      },
+      onClose: (options) => {
+        if (options?.data) execute()
+      },
+    })
+  }
+
+  const onRowClick = async (event: DataTableRowClickEvent<any>) => {
+    console.log('hgihi')
+    const id = event.data.id
+    if (id) {
+      const { data, statusCode } = await request<File>(
+        `/api/contract-crawl-data/models/${id}`,
+        {
+          method: 'GET',
+        },
+      )
+      if (statusCode.value === 200) {
+        dialog.open(resolveComponent('DialogFile'), {
+          data: {
+            file: data,
+            dataTypes,
+            fileTypes,
+            insureTypes,
+          },
+          props: {
+            modal: true,
+            header: `작업파일 상세`,
+          },
+          onClose: (options) => {
+            const data = options?.data
+            if (data) execute()
+          },
+        })
+      }
+    }
+  }
 </script>
 <template>
   <ListDataTable
@@ -70,10 +120,17 @@
     @page="onPage"
     @sort="onSort"
     @search="execute"
-    @clear-filter="clearFilter">
+    @clear-filter="clearFilter"
+    :row-class="() => 'cursor-pointer'"
+    @row-click="onRowClick">
     <template #header-right>
       <div class="flex items-center gap-2">
-        <Button class="!h-10 !px-4" label="파일 생성" severity="primary" raised />
+        <Button
+          class="!h-10 !px-4"
+          label="파일 생성"
+          severity="primary"
+          raised
+          @click="onClickFileCreate" />
       </div>
     </template>
     <template #filters>
