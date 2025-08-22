@@ -1,12 +1,18 @@
-import { jobSchema, type ManualJobForm, manualJobSchema, type Job, type JobForm } from "~/types/job"
+import {
+  jobSchema,
+  type ManualJobForm,
+  manualJobSchema,
+  type Job,
+  type JobForm,
+} from '~/types/job'
 import { v4 as uuidv4 } from 'uuid'
 
 export const useJobForm = () => {
   const jobForm = ref<JobForm>({
     id: uuidv4(),
     botId: '',
-    jobType: "",
-    cronSchedule: '',
+    jobType: '',
+    cronSchedule: undefined,
     lifetime: 1200000,
     closingMonth: undefined,
     locked: false,
@@ -44,10 +50,13 @@ export const useJobForm = () => {
     closingMonthNum: 0,
   })
 
-  const { errors: manualErrors, validate: manualValidate } = useFormValidator(manualJobSchema, () => ({
-    priority: manualJobForm.value.priority,
-    closingMonthNum: manualJobForm.value.closingMonthNum,
-  }))
+  const { errors: manualErrors, validate: manualValidate } = useFormValidator(
+    manualJobSchema,
+    () => ({
+      priority: manualJobForm.value.priority,
+      closingMonthNum: manualJobForm.value.closingMonthNum,
+    }),
+  )
   return {
     jobForm,
     errors,

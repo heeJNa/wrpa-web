@@ -30,6 +30,7 @@
   })
 
   const createJob = () => {
+    console.log('Updating job:', jobForm.value)
     if (validate()) {
       request(`/api/contract-crawl/jobs-v2`, {
         method: 'POST',
@@ -46,6 +47,7 @@
     }
   }
   const updateJob = async () => {
+    console.log('Updating job:', jobForm.value)
     if (validate()) {
       request(`/api/contract-crawl/jobs-v2/${jobForm.value.id}`, {
         method: 'PUT',
@@ -156,6 +158,8 @@
             v-model="insuranceCompanyCode"
             :options="insuranceCompanyCodes"
             showClear
+            filter
+            auto-filter-focus
             option-label="name"
             option-value="code"
             @change="onChangeCompanyIdOrInsuranceCompanyCode" />
