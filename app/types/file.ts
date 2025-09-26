@@ -10,7 +10,7 @@ import { z } from 'zod'
 // }
 
 const fileSchema = z.object({
-    id: z.uuidv4(),
+    id: z.string(),
     insuranceCompanyCode: z.string().min(1, '보험사 코드를 입력해주세요'),
     dataType: z.enum(Object.keys(JobTypesEnum) as [string, ...string[]], '데이터 유형을 입력해주세요'),
     fileType: z.string().min(1, '파일 유형을 입력해주세요'),

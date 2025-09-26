@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 export const useFileForm = () => {
   const fileForm = ref<FileForm>({
-    id: uuidv4(),
+    id: '',
     insuranceCompanyCode: '',
     dataType: "",
     fileType: '',

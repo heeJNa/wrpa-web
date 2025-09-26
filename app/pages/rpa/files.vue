@@ -80,7 +80,6 @@
   }
 
   const onRowClick = async (event: DataTableRowClickEvent<any>) => {
-    console.log('hgihi')
     const id = event.data.id
     if (id) {
       const { data, statusCode } = await request<File>(

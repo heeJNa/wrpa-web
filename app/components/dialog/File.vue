@@ -29,7 +29,9 @@
     }
   })
 
-  const upsertFile = (type: 'create' | 'update') => {
+const upsertFile = (type: 'create' | 'update') => {
+    console.log('fileForm', fileForm.value)
+    
     if (validate()) {
       request(`/api/contract-crawl-data/models`, {
         method: 'POST',
@@ -46,7 +48,7 @@
     }
   }
 
-  const deleteFile = async () => {
+const deleteFile = async () => {
     request(`/api/contract-crawl-data/models/${fileForm.value.id}`, {
       method: 'DELETE',
     }).onFetchResponse(async (response) => {
