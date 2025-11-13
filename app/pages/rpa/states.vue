@@ -58,9 +58,10 @@
         insuranceCompanyType: insuranceCompanyType,
         insuranceCompanyCode: insuranceCompanyCode,
         jobType: jobType,
-        workState: workState,
+        state: workState,
         resultStatus: resultStatus,
         createType: createType,
+        workerId: workerId,
         includedScheduled: 'Y',
       },
     },
@@ -83,9 +84,10 @@
       insuranceCompanyType: insuranceCompanyType,
       insuranceCompanyCode: insuranceCompanyCode,
       jobType: jobType,
-      workState: workState,
+      state: workState,
       resultStatus: resultStatus,
       createType: createType,
+       workerId: workerId,
       includedScheduled: 'Y',
     },
     immediate: false,
@@ -315,6 +317,18 @@
           option-value="value"
           @update:model-value="execute()" />
         <label class="dark:text-surface-0" for="on_label">생성구분</label>
+      </FloatLabel>
+      <FloatLabel variant="on">
+        <Select
+          class="w-48"
+          v-model="workerId"
+          :options="workers?.values ?? []"
+          showClear
+          label-id="on_label"
+          option-label="name"
+          option-value="id"
+          @update:model-value="execute()" />
+        <label class="dark:text-surface-0" for="on_label">작업자</label>
       </FloatLabel>
     </template>
     <template #toolbar-end>
