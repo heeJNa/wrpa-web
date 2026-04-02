@@ -1,5 +1,5 @@
 # Base
-FROM node:22-alpine AS base
+FROM --platform=linux/amd64 node:22-alpine AS base
 RUN corepack enable && npm install -g pm2
 WORKDIR /app
 
@@ -16,7 +16,7 @@ RUN pnpm install --frozen-lockfile
 RUN pnpm build
 
 # Runtime
-FROM node:22-alpine AS runtime
+FROM --platform=linux/amd64 node:22-alpine AS runtime
 RUN corepack enable && npm install -g pm2
 WORKDIR /app
 COPY --from=build /app/.output /app/.output
