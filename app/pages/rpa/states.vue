@@ -1,21 +1,17 @@
 <script setup lang="ts">
-  import type { DataTableSortEvent } from 'primevue/datatable'
-  import type { PageState } from 'primevue/paginator'
   import { JobTypesEnum } from '~/types/enum'
   import type { WorkerDetail } from '~/types/worker'
 
   const { insuranceCompanyCodes, teams } = useGlobalData()
-  const dialog = useDialog()
   const toast = useToast()
   const { request } = useClientAPI()
-  const confirm = useConfirm()
 
-  const workDate = ref<Date>(new Date())
+  const workDate = ref<string>(formatToKoreanTime(new Date(), 'YYYY-MM-DD'))
   const companyId = ref<string>()
   const insuranceCompanyType = ref<string>()
   const insuranceCompanyCode = ref<string>()
   const jobType = ref<string>()
-  const closingMonth = ref<Date>()
+  const closingMonth = ref<string>()
   const workState = ref<string>()
   const resultStatus = ref<string>()
   const createType = ref<string>()
@@ -24,16 +20,6 @@
   const size = ref(100)
   const sort = ref<string[]>([])
 
-  const refineWorkDate = computed(() => {
-    return formatToKoreanTime(workDate.value, 'YYYY-MM-DD')
-  })
-  const refineClosingMonth = computed(() => {
-    if (!closingMonth.value) return null
-    return formatToKoreanTime(closingMonth.value, 'YYYY-MM')
-  })
-  watch(refineClosingMonth, () => {
-    execute()
-  })
   const { data: workStates } = await useLazyAPI<{ code: string; name: string }[]>(
     '/api/basic/work-states',
   )
@@ -52,9 +38,9 @@
         page: page,
         size: size,
         sort: sort,
-        workDate: refineWorkDate,
-        compayId: companyId,
-        closingMonth: refineClosingMonth, // Format to 'YYYY-MM'
+        workDate: workDate,
+        companyId: companyId,
+        closingMonth: closingMonth,
         insuranceCompanyType: insuranceCompanyType,
         insuranceCompanyCode: insuranceCompanyCode,
         jobType: jobType,
@@ -78,16 +64,16 @@
       page: page,
       size: size,
       sort: sort,
-      workDate: refineWorkDate,
-      compayId: companyId,
-      closingMonth: refineClosingMonth, // Format to 'YYYY-MM'
+      workDate: workDate,
+      companyId: companyId,
+      closingMonth: closingMonth,
       insuranceCompanyType: insuranceCompanyType,
       insuranceCompanyCode: insuranceCompanyCode,
       jobType: jobType,
       state: workState,
       resultStatus: resultStatus,
       createType: createType,
-       workerId: workerId,
+      workerId: workerId,
       includedScheduled: 'Y',
     },
     immediate: false,
@@ -97,27 +83,19 @@
     executeSummary()
   })
 
-  const onPage = async (event: PageState) => {
+  const onPage = async (event: { page: number; rows: number; first: number }) => {
     page.value = event.page
     size.value = event.rows
     await execute()
   }
-  const onSort = async (event: DataTableSortEvent) => {
-    if (!event.multiSortMeta) return
-    const sortMeta = event.multiSortMeta.map((meta) => {
-      return `${meta.field},${meta.order === 1 ? 'asc' : 'desc'}`
-    })
-    sort.value = sortMeta
-    page.value = 0 // Reset to first page on sort
-    execute()
-  }
+
   const clearFilter = () => {
-    workDate.value = new Date()
+    workDate.value = formatToKoreanTime(new Date(), 'YYYY-MM-DD')
     companyId.value = undefined
     insuranceCompanyType.value = undefined
     insuranceCompanyCode.value = undefined
     jobType.value = undefined
-    closingMonth.value = new Date()
+    closingMonth.value = undefined
     workState.value = undefined
     resultStatus.value = undefined
     createType.value = undefined
@@ -126,71 +104,60 @@
     execute()
   }
 
+  // Dialog state
+  const showDialog = ref(false)
+  const editData = ref<any>(null)
+
   const onOpenWorkStateDetail = (_data: any) => {
-    dialog.open(resolveComponent('DialogWorkStateDetail'), {
-      data: _data,
-      props: {
-        modal: true,
-        header: `작업 상세`,
-      },
-      onClose: (options) => {
-        const data = options?.data
-        if (data?.message === 'success' || data?.message === 'OK') execute()
-      },
-    })
+    editData.value = _data
+    showDialog.value = true
   }
+  const onDialogClose = (result?: any) => {
+    showDialog.value = false
+    if (result?.message === 'success' || result?.message === 'OK') execute()
+  }
+
+  // Resend confirm
+  const showResendConfirm = ref(false)
+  const resendWorkId = ref<string>()
 
   const resendWorkResult = (workId?: string) => {
     if (!workId) {
       toast.add({
-        severity: 'warn',
-        summary: '경고',
-        detail: '작업 ID가 없습니다.',
+        title: '경고',
+        description: '작업 ID가 없습니다.',
+        color: 'warning',
+        icon: 'i-lucide-alert-triangle',
       })
     } else {
-      confirm.require({
-        message: '작업 결과를 해당 회사에 재전송하시겠습니까?',
-        header: '작업 결과 전송',
-        icon: 'pi pi-exclamation-triangle',
-        rejectProps: {
-          label: '취소',
-          severity: 'secondary',
-          outlined: true,
-        },
-        acceptProps: {
-          label: '전송',
-        },
-        accept: () => {
-          request<any>(`/api/contract-crawl/works-v2/send-result/${workId}`, {
-            method: 'POST',
-          }).then(({ data, statusCode }) => {
-            if (statusCode.value === 200) {
-              toast.add({
-                severity: 'success',
-                summary: '성공',
-                detail: '작업 결과가 성공적으로 전송되었습니다.',
-                life: 3000,
-              })
-            } else {
-              toast.add({
-                severity: 'error',
-                summary: '오류',
-                detail: `작업 결과 전송 실패: ${data.value?.message || '알 수 없는 오류'}`,
-                life: 3000,
-              })
-            }
-          })
-        },
-        // reject: () => {
-        //   toast.add({
-        //     severity: 'error',
-        //     summary: 'Rejected',
-        //     detail: 'You have rejected',
-        //     life: 3000,
-        //   })
-        // },
-      })
+      resendWorkId.value = workId
+      showResendConfirm.value = true
     }
+  }
+
+  const confirmResend = () => {
+    showResendConfirm.value = false
+    request<any>(`/api/contract-crawl/works-v2/send-result/${resendWorkId.value}`, {
+      method: 'POST',
+    }).then(({ data, statusCode }) => {
+      if (statusCode.value === 200) {
+        toast.add({
+          title: '성공',
+          description: '작업 결과가 성공적으로 전송되었습니다.',
+          color: 'success',
+          icon: 'i-lucide-check-circle',
+          duration: 3000,
+        })
+      } else {
+        toast.add({
+          title: '오류',
+          description: `작업 결과 전송 실패: ${data.value?.message || '알 수 없는 오류'}`,
+          color: 'error',
+          icon: 'i-lucide-circle-x',
+          duration: 3000,
+        })
+      }
+    })
   }
 </script>
 <template>
@@ -201,229 +168,201 @@
     :page="page"
     :size="size"
     @page="onPage"
-    @sort="onSort"
     @search="execute"
-    @clearFilter="clearFilter"
-    :row-class="() => 'cursor-pointer'"
+    @clear-filter="clearFilter"
     @row-click="(event) => onOpenWorkStateDetail(event.data)">
     <template #filters>
-      <FloatLabel variant="on">
-        <DatePicker
-          class="w-48"
-          v-model="workDate"
-          dateFormat="yy-mm-dd"
-          label-id="on_label"
-          show-icon
-          :manual-input="false"
-          show-button-bar
-          @update:model-value="execute()" />
-        <label class="dark:text-surface-0" for="on_label">작업일</label>
-      </FloatLabel>
-      <FloatLabel variant="on">
-        <Select
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-(--ui-text-muted)">작업일</label>
+        <UInput class="w-48" v-model="workDate" type="date" @change="execute()" />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-(--ui-text-muted)">회사명</label>
+        <USelectMenu
           class="w-64"
           v-model="companyId"
-          :options="teams"
-          showClear
-          filter
-          auto-filter-focus
-          label-id="on_label"
-          option-label="name"
-          option-value="id"
+          :items="teams"
+          label-key="name"
+          value-key="id"
+          placeholder="회사명"
           @update:model-value="execute()" />
-        <label class="dark:text-surface-0" for="on_label">회사명</label>
-      </FloatLabel>
-      <FloatLabel variant="on">
-        <Select
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-(--ui-text-muted)">구분</label>
+        <USelectMenu
           class="w-48"
           v-model="insuranceCompanyType"
-          :options="insuranceCompanyTypes"
-          showClear
-          label-id="on_label"
-          option-label="label"
-          option-value="value"
+          :items="insuranceCompanyTypes"
+          label-key="label"
+          value-key="value"
+          placeholder="구분"
           @update:model-value="execute()" />
-        <label class="dark:text-surface-0" for="on_label">구분</label>
-      </FloatLabel>
-      <FloatLabel variant="on">
-        <Select
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-(--ui-text-muted)">보험사</label>
+        <USelectMenu
           class="w-64"
           v-model="insuranceCompanyCode"
-          :options="insuranceCompanyCodes"
-          showClear
-          filter
-          auto-filter-focus
-          label-id="on_label"
-          option-label="name"
-          option-value="code"
+          :items="insuranceCompanyCodes as any"
+          label-key="name"
+          value-key="code"
+          placeholder="보험사"
           @update:model-value="execute()" />
-        <label class="dark:text-surface-0" for="on_label">보험사</label>
-      </FloatLabel>
-      <FloatLabel variant="on">
-        <Select
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-(--ui-text-muted)">작업구분</label>
+        <USelectMenu
           class="w-48"
           v-model="jobType"
-          :options="enumToLabelValue(JobTypesEnum)"
-          showClear
-          label-id="on_label"
-          option-label="label"
-          option-value="value"
+          :items="enumToLabelValue(JobTypesEnum)"
+          label-key="label"
+          value-key="value"
+          placeholder="작업구분"
           @update:model-value="execute()" />
-        <label class="dark:text-surface-0" for="on_label">작업구분</label>
-      </FloatLabel>
-      <FloatLabel variant="on">
-        <DatePicker
-          class="w-48"
-          v-model="closingMonth"
-          view="month"
-          dateFormat="yy-mm"
-          label-id="on_label"
-          show-icon
-          show-button-bar />
-        <label class="dark:text-surface-0" for="on_label">업적월</label>
-      </FloatLabel>
-      <FloatLabel variant="on">
-        <Select
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-(--ui-text-muted)">업적월</label>
+        <UInput class="w-48" v-model="closingMonth" type="month" @change="execute()" />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-(--ui-text-muted)">상태</label>
+        <USelectMenu
           class="w-32"
           v-model="workState"
-          :options="workStates"
-          showClear
-          label-id="on_label"
-          option-label="name"
-          option-value="code"
+          :items="workStates ?? []"
+          label-key="name"
+          value-key="code"
+          placeholder="상태"
           @update:model-value="execute()" />
-        <label class="dark:text-surface-0" for="on_label">상태</label>
-      </FloatLabel>
-      <FloatLabel variant="on">
-        <Select
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-(--ui-text-muted)">상태코드</label>
+        <USelectMenu
           class="w-64"
           v-model="resultStatus"
-          :options="workStatusCodes"
-          showClear
-          label-id="on_label"
-          option-label="label"
-          option-value="value"
+          :items="workStatusCodes"
+          label-key="label"
+          value-key="value"
+          placeholder="상태코드"
           @update:model-value="execute()" />
-        <label class="dark:text-surface-0" for="on_label">상태코드</label>
-      </FloatLabel>
-      <FloatLabel variant="on">
-        <Select
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-(--ui-text-muted)">생성구분</label>
+        <USelectMenu
           class="w-32"
           v-model="createType"
-          :options="workCreateTypes"
-          showClear
-          label-id="on_label"
-          option-label="label"
-          option-value="value"
+          :items="workCreateTypes"
+          label-key="label"
+          value-key="value"
+          placeholder="생성구분"
           @update:model-value="execute()" />
-        <label class="dark:text-surface-0" for="on_label">생성구분</label>
-      </FloatLabel>
-      <FloatLabel variant="on">
-        <Select
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-(--ui-text-muted)">작업자</label>
+        <USelectMenu
           class="w-48"
           v-model="workerId"
-          :options="workers?.values ?? []"
-          showClear
-          label-id="on_label"
-          option-label="name"
-          option-value="id"
+          :items="(workers?.values ?? []) as any"
+          label-key="name"
+          value-key="id"
+          placeholder="작업자"
           @update:model-value="execute()" />
-        <label class="dark:text-surface-0" for="on_label">작업자</label>
-      </FloatLabel>
+      </div>
     </template>
     <template #toolbar-end>
-      <span class="text-surface-500 dark:text-surface-100 text-lg font-bold">
+      <span class="text-lg font-bold text-(--ui-text-muted)">
         성공 {{ summary?.success || 0 }}건 | 실패 {{ summary?.fail || 0 }}건 | 작업
         {{ summary?.working || 0 }}건 | 대기 {{ summary?.waiting || 0 }}건 | 취소
         {{ summary?.cancel || 0 }}건
       </span>
     </template>
-    <template #columns>
-      <Column class="text-center" field="createTypeSimple" header="생성"> </Column>
-      <Column field="companyName" header="회사명"> </Column>
-      <Column field="accountName" header="계정명"> </Column>
-      <Column field="insuranceCompanyName" header="보험사"> </Column>
-      <Column class="text-center" field="jobSimple" header="작업"></Column>
-      <Column field="contractCrawlDataModelPretty" header="파일명"></Column>
-      <Column class="text-center" field="closingMonth" header="업적월"> </Column>
-      <Column class="text-center" field="workerId" header="작업자"> </Column>
-      <Column class="text-right" field="priority" header="우선순위"> </Column>
-      <Column class="text-center" field="workStatePretty" header="상태">
-        <template #body="slotProps">
-          <Badge :severity="getColorByWorkState(slotProps.data.workState)" size="large">
-            {{ slotProps.data.workStatePretty }}
-          </Badge>
-        </template>
-      </Column>
-      <Column
-        class="overflow-hidden text-center overflow-ellipsis whitespace-nowrap"
-        style="max-width: 10rem"
-        field="note"
-        header="비고">
-        <template #body="slotProps">
-          <span>{{ slotProps.data.note || '-' }}</span>
-        </template>
-      </Column>
-      <Column class="text-center" header="파일수">
-        <template #body="slotProps">
-          <span
-            >{{ slotProps.data?.filesSize || 0 }} /
-            {{ slotProps.data?.filesSizeMax || 0 }}</span
-          >
-        </template>
-      </Column>
-      <Column class="text-center" field="retriedCount" header="시도"></Column>
-      <Column class="text-center" header="생성일시">
-        <template #body="slotProps">
-          <span>{{ cutYearIfSame(slotProps.data?.createdTimePretty) }}</span>
-        </template>
-      </Column>
-      <Column class="text-center" header="예정일시">
-        <template #body="slotProps">
-          <span
-            >{{ cutYearIfSame(slotProps.data?.workScheduleDate) }}
-            <span>{{ slotProps.data?.workScheduleTime || '-' }}</span></span
-          >
-        </template>
-      </Column>
-      <Column class="text-center" header="시작일시">
-        <template #body="slotProps">
-          <span>{{ cutYearIfSame(slotProps.data?.startedTimePretty) }} </span>
-        </template>
-      </Column>
-      <Column class="text-center" header="Timeout(ms)">
-        <template #body="slotProps">
-          <span
-            >{{ convertTimeoutMsToMinutesString(slotProps.data?.lifetime || 0) }}
-          </span>
-        </template>
-      </Column>
-      <Column class="text-center" header="소요시간">
-        <template #body="slotProps">
-          <span>{{ slotProps.data?.workTimePretty || '-' }} </span>
-        </template>
-      </Column>
-      <Column class="text-center" header="전송">
-        <template #body="slotProps">
-          <Button
-            class="mx-4"
-            :disabled="slotProps.data?.resultStatus !== '200'"
-            :severity="slotProps.data?.resultStatus === '200' ? '' : 'secondary'"
-            size="small"
-            @click="resendWorkResult(slotProps.data?.workId)"
-            >전송</Button
-          >
-        </template>
-      </Column>
-
-      <!-- <Column field="originPathDetail" header="상세경로"></Column>
-      <Column class="text-right" field="lifetime" header="Timeout(ms)"></Column> -->
-      <!-- <Column field="note" header="비고">
-        <template #body="slotProps">
-          {{ slotProps.data.note || '-' }}
-        </template>
-      </Column> -->
+    <template #column-headers>
+      <th class="px-3 py-2 text-center text-xs font-semibold">생성</th>
+      <th class="px-3 py-2 text-left text-xs font-semibold">회사명</th>
+      <th class="px-3 py-2 text-left text-xs font-semibold">계정명</th>
+      <th class="px-3 py-2 text-left text-xs font-semibold">보험사</th>
+      <th class="px-3 py-2 text-center text-xs font-semibold">작업</th>
+      <th class="px-3 py-2 text-left text-xs font-semibold">파일명</th>
+      <th class="px-3 py-2 text-center text-xs font-semibold">업적월</th>
+      <th class="px-3 py-2 text-center text-xs font-semibold">작업자</th>
+      <th class="px-3 py-2 text-right text-xs font-semibold">우선순위</th>
+      <th class="px-3 py-2 text-center text-xs font-semibold">상태</th>
+      <th class="px-3 py-2 text-center text-xs font-semibold" style="max-width: 10rem">
+        비고
+      </th>
+      <th class="px-3 py-2 text-center text-xs font-semibold">파일수</th>
+      <th class="px-3 py-2 text-center text-xs font-semibold">시도</th>
+      <th class="px-3 py-2 text-center text-xs font-semibold">생성일시</th>
+      <th class="px-3 py-2 text-center text-xs font-semibold">예정일시</th>
+      <th class="px-3 py-2 text-center text-xs font-semibold">시작일시</th>
+      <th class="px-3 py-2 text-center text-xs font-semibold">Timeout(ms)</th>
+      <th class="px-3 py-2 text-center text-xs font-semibold">소요시간</th>
+      <th class="px-3 py-2 text-center text-xs font-semibold">전송</th>
+    </template>
+    <template #columns="{ data: row }">
+      <td class="px-3 py-2 text-center">{{ row.createTypeSimple }}</td>
+      <td class="px-3 py-2">{{ row.companyName }}</td>
+      <td class="px-3 py-2">{{ row.accountName }}</td>
+      <td class="px-3 py-2">{{ row.insuranceCompanyName }}</td>
+      <td class="px-3 py-2 text-center">{{ row.jobSimple }}</td>
+      <td class="px-3 py-2">{{ row.contractCrawlDataModelPretty }}</td>
+      <td class="px-3 py-2 text-center">{{ row.closingMonth }}</td>
+      <td class="px-3 py-2 text-center">{{ row.workerId }}</td>
+      <td class="px-3 py-2 text-right">{{ row.priority }}</td>
+      <td class="px-3 py-2 text-center">
+        <UBadge :color="getColorByWorkState(row.workState) as any" size="lg">
+          {{ row.workStatePretty }}
+        </UBadge>
+      </td>
+      <td class="max-w-[10rem] truncate px-3 py-2 text-center">
+        {{ row.note || '-' }}
+      </td>
+      <td class="px-3 py-2 text-center">
+        {{ row?.filesSize || 0 }} / {{ row?.filesSizeMax || 0 }}
+      </td>
+      <td class="px-3 py-2 text-center">{{ row.retriedCount }}</td>
+      <td class="px-3 py-2 text-center">{{ cutYearIfSame(row?.createdTimePretty) }}</td>
+      <td class="px-3 py-2 text-center">
+        {{ cutYearIfSame(row?.workScheduleDate) }}
+        {{ row?.workScheduleTime || '-' }}
+      </td>
+      <td class="px-3 py-2 text-center">{{ cutYearIfSame(row?.startedTimePretty) }}</td>
+      <td class="px-3 py-2 text-center">
+        {{ convertTimeoutMsToMinutesString(row?.lifetime || 0) }}
+      </td>
+      <td class="px-3 py-2 text-center">{{ row?.workTimePretty || '-' }}</td>
+      <td class="px-3 py-2 text-center" @click.stop>
+        <UButton
+          :disabled="row?.resultStatus !== '200'"
+          :color="row?.resultStatus === '200' ? 'primary' : 'neutral'"
+          size="sm"
+          @click="resendWorkResult(row?.workId)">
+          전송
+        </UButton>
+      </td>
     </template>
   </ListDataTable>
-  <ConfirmDialog :pt="confirmPT" />
+
+  <DialogWorkStateDetail v-if="showDialog" :data="editData" @close="onDialogClose" />
+
+  <!-- Resend confirmation modal -->
+  <UModal v-model:open="showResendConfirm">
+    <template #header>
+      <span class="font-semibold">작업 결과 전송</span>
+    </template>
+    <div class="p-6">
+      <div class="mb-4 flex flex-col items-center gap-4">
+        <UIcon class="size-12 text-yellow-500" name="i-lucide-alert-triangle" />
+        <p class="text-center">작업 결과를 해당 회사에 재전송하시겠습니까?</p>
+      </div>
+      <div class="flex justify-center gap-4">
+        <UButton
+          color="neutral"
+          variant="outline"
+          label="취소"
+          @click="showResendConfirm = false" />
+        <UButton color="primary" label="전송" @click="confirmResend" />
+      </div>
+    </div>
+  </UModal>
 </template>
