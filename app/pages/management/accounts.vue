@@ -178,6 +178,7 @@
           </template> -->
       </Column>
       <Column field="insuranceCompanyName" header="보험사" sortable></Column>
+      <Column field="name" header="계정명" sortable></Column>
       <Column field="userId" header="아이디"></Column>
       <Column header="휴대폰">
         <template #body="slotProps">

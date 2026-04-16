@@ -13,6 +13,7 @@
   const confirm = useConfirm()
 
   const selection = ref<any[]>([])
+  const showManualForm = ref(false)
 
   const companyId = ref<string>()
   const insuranceCompanyCode = ref<string>()
@@ -128,10 +129,11 @@
   }
 
   const createWorkManually = (job: any) => {
+    showManualForm.value = true
     manualJobForm.value.closingMonthNum = job.closingMonthNum || 0
     manualJobForm.value.priority = job.priority || 100
     confirm.require({
-      message: `"${job.accountName}(${job.contractCrawlDataModelPretty})" 작업을 
+      message: `"${job.accountName}(${job.contractCrawlDataModelPretty})" 작업을
       즉시 생성하시겠습니까?`,
       header: '작업 생성',
       icon: 'pi pi-exclamation-triangle',
@@ -144,6 +146,7 @@
         label: '생성',
       },
       onHide() {
+        showManualForm.value = false
         manualJobForm.value.closingMonthNum = 0
         manualJobForm.value.priority = 100
       },
@@ -240,6 +243,108 @@
       closingMonthNum: undefined,
       timeout: undefined,
     }
+  }
+
+  const onBatchCreateWork = () => {
+    if (selection.value.length === 0) {
+      toast.add({
+        severity: 'warn',
+        summary: '경고',
+        detail: '작업을 선택해주세요.',
+        life: 3000,
+      })
+      return
+    }
+    const count = selection.value.length
+    confirm.require({
+      message: `선택한 ${count}개 작업에 대해 즉시 작업을 생성하시겠습니까?`,
+      header: '일괄 작업 생성',
+      icon: 'pi pi-exclamation-triangle',
+      rejectProps: {
+        label: '취소',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptProps: {
+        label: '생성',
+      },
+      accept: async () => {
+        try {
+          const { statusCode } = await request(
+            `/api/contract-crawl/jobs/selected/batch/works-v2`,
+            {
+              method: 'POST',
+              body: JSON.stringify({
+                ids: selection.value.map((job) => job.id),
+              }),
+            },
+          )
+          if (statusCode.value === 200) {
+            toast.add({
+              severity: 'success',
+              summary: '성공',
+              detail: `${count}개 작업이 성공적으로 생성되었습니다.`,
+              life: 3000,
+            })
+            selection.value = []
+            execute()
+          } else {
+            toast.add({
+              severity: 'error',
+              summary: '오류',
+              detail: '일괄 작업 생성에 실패했습니다.',
+              life: 3000,
+            })
+          }
+        } catch (error) {
+          console.error('일괄 작업 생성 실패:', error)
+          toast.add({
+            severity: 'error',
+            summary: '오류',
+            detail: '일괄 작업 생성에 실패했습니다.',
+            life: 3000,
+          })
+        }
+      },
+    })
+  }
+
+  const onClickBatchCopy = () => {
+    if (selection.value.length === 0) {
+      toast.add({
+        severity: 'warn',
+        summary: '경고',
+        detail: '복사할 작업을 선택해주세요.',
+        life: 3000,
+      })
+      return
+    }
+    const codes = new Set(
+      selection.value.map((job) => job.insuranceCompanyCode).filter(Boolean),
+    )
+    if (codes.size > 1) {
+      toast.add({
+        severity: 'warn',
+        summary: '경고',
+        detail:
+          '선택한 작업의 보험사가 서로 달라 복사할 수 없습니다. 동일한 보험사끼리만 복사할 수 있어요.',
+        life: 5000,
+      })
+      return
+    }
+    dialog.open(resolveComponent('DialogJobCopy'), {
+      data: { jobs: selection.value },
+      props: {
+        modal: true,
+        header: '작업일정 복사 생성',
+      },
+      onClose: (options) => {
+        if (options?.data?.success) {
+          selection.value = []
+          execute()
+        }
+      },
+    })
   }
 </script>
 <template>
@@ -436,6 +541,20 @@
           @click="onBatchUpdate" />
         <Button
           type="button"
+          icon="pi pi-play"
+          label="일괄 작업생성"
+          severity="success"
+          raised
+          @click="onBatchCreateWork" />
+        <Button
+          type="button"
+          icon="pi pi-copy"
+          label="복사 생성"
+          severity="help"
+          raised
+          @click="onClickBatchCopy" />
+        <Button
+          type="button"
           icon="pi pi-filter-slash"
           label="초기화"
           outlined
@@ -493,7 +612,7 @@
   <ConfirmDialog :pt="confirmPT">
     <template #message="slotProps">
       <p class="text-center whitespace-pre-wrap">{{ slotProps.message.message }}</p>
-      <div class="flex w-full justify-around gap-2">
+      <div class="flex w-full justify-around gap-2" v-if="showManualForm">
         <DialogForm label="업적월" required :error="manualErrors.closingMonthNum">
           <template #input>
             <InputNumber

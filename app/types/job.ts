@@ -91,6 +91,11 @@ interface JobBatchUpdatePayload {
   timeout?: number
   locked?: boolean
 }
+
+interface JobBatchCopyPayload {
+  ids: string[]
+  targetBotId: string
+}
 export {
   jobSchema,
   type Job,
@@ -99,4 +104,5 @@ export {
   manualJobSchema,
   type ManualJobForm,
   type JobBatchUpdatePayload,
+  type JobBatchCopyPayload,
 }
