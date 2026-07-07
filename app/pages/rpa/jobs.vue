@@ -587,6 +587,12 @@
       </Column>
       <Column class="text-center" field="closingMonthNum" header="업적월"> </Column>
       <Column class="text-right" field="priority" header="우선순위"> </Column>
+      <Column class="text-center" header="자동/수동">
+        <template #body="slotProps">
+          <Tag v-if="slotProps.data.priorityManual" value="수동" severity="warning" />
+          <Tag v-else value="자동" severity="info" />
+        </template>
+      </Column>
       <Column class="text-right" field="lifetime" header="Timeout(ms)"> </Column>
       <Column class="text-center" field="locked" header="잠김">
         <template #body="slotProps">

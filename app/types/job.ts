@@ -51,6 +51,9 @@ const jobSchema = z.object({
     .int()
     .min(0, '우선순위는 0 이상이어야 합니다'),
   closingMonthNum: z.number('업적월을 입력해주세요').int(),
+  priorityManual: z.boolean().optional(),
+  activeBizDayFrom: z.number().int().min(1).max(31).optional().nullable(),
+  activeBizDayTo: z.number().int().min(1).max(99).optional().nullable(),
   note: z
     .string()
     .max(200, '노트는 최대 200자까지 입력할 수 있습니다')

@@ -24,6 +24,9 @@ export const useJobForm = () => {
     workTime: '00:30',
     priority: 100,
     closingMonthNum: 0,
+    priorityManual: false,
+    activeBizDayFrom: null,
+    activeBizDayTo: null,
     note: undefined,
   })
   const { errors, validate } = useFormValidator(jobSchema, () => ({
@@ -42,6 +45,9 @@ export const useJobForm = () => {
     workTime: jobForm.value.workTime,
     priority: jobForm.value.priority,
     closingMonthNum: jobForm.value.closingMonthNum,
+    priorityManual: jobForm.value.priorityManual,
+    activeBizDayFrom: jobForm.value.activeBizDayFrom,
+    activeBizDayTo: jobForm.value.activeBizDayTo,
     note: jobForm.value.note,
   }))
 

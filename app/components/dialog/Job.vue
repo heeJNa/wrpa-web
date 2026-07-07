@@ -302,6 +302,48 @@
           </template>
         </DialogForm>
       </div>
+      <div class="col-span-2 flex gap-4">
+        <DialogForm
+          class="flex-auto text-center"
+          label="수동 우선순위 고정"
+          :error="errors?.priorityManual">
+          <template #input>
+            <div class="flex h-full items-center justify-center">
+              <Checkbox id="priorityManual" v-model="jobForm.priorityManual" binary />
+            </div>
+          </template>
+        </DialogForm>
+        <DialogForm
+          class="flex-1/3"
+          label="유효 영업일 시작"
+          :error="errors?.activeBizDayFrom">
+          <template #input>
+            <InputNumber
+              id="activeBizDayFrom"
+              v-model="jobForm.activeBizDayFrom"
+              :min="1"
+              :max="31"
+              showButtons
+              fluid
+              placeholder="기본 1" />
+          </template>
+        </DialogForm>
+        <DialogForm
+          class="flex-1/3"
+          label="유효 영업일 종료"
+          :error="errors?.activeBizDayTo">
+          <template #input>
+            <InputNumber
+              id="activeBizDayTo"
+              v-model="jobForm.activeBizDayTo"
+              :min="1"
+              :max="99"
+              showButtons
+              fluid
+              placeholder="비움=전월5/당월무제한, 99=상시" />
+          </template>
+        </DialogForm>
+      </div>
     </form>
     <!-- 등록 버튼 -->
     <div class="mt-6 flex justify-center gap-4">
