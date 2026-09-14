@@ -32,7 +32,7 @@
     return formatToKoreanTime(closingMonth.value, 'YYYY-MM')
   })
   watch(refineClosingMonth, () => {
-    execute()
+    search()
   })
   const { data: workStates } = await useLazyAPI<{ code: string; name: string }[]>(
     '/api/basic/work-states',
@@ -75,9 +75,6 @@
     working: number
   }>(`/api/contract-crawl/works-v2/summary`, {
     query: {
-      page: page,
-      size: size,
-      sort: sort,
       workDate: refineWorkDate,
       companyId: companyId,
       closingMonth: refineClosingMonth, // Format to 'YYYY-MM'
@@ -90,12 +87,10 @@
       workerId: workerId,
       includedScheduled: 'Y',
     },
-    immediate: false,
   })
 
-  watch(data, () => {
-    executeSummary()
-  })
+  // 필터 변경 시 목록과 합계를 병렬로 조회. 페이지/정렬 변경은 합계가 바뀌지 않으므로 execute()만 호출
+  const search = () => Promise.all([execute(), executeSummary()])
 
   const onPage = async (event: PageState) => {
     page.value = event.page
@@ -123,7 +118,7 @@
     createType.value = undefined
     workerId.value = undefined
     page.value = 0
-    execute()
+    search()
   }
 
   const onOpenWorkStateDetail = (_data: any) => {
@@ -135,7 +130,7 @@
       },
       onClose: (options) => {
         const data = options?.data
-        if (data?.message === 'success' || data?.message === 'OK') execute()
+        if (data?.message === 'success' || data?.message === 'OK') search()
       },
     })
   }
@@ -216,7 +211,7 @@
           show-icon
           :manual-input="false"
           show-button-bar
-          @update:model-value="execute()" />
+          @update:model-value="search()" />
         <label class="dark:text-surface-0" for="on_label">작업일</label>
       </FloatLabel>
       <FloatLabel variant="on">
@@ -230,7 +225,7 @@
           label-id="on_label"
           option-label="name"
           option-value="id"
-          @update:model-value="execute()" />
+          @update:model-value="search()" />
         <label class="dark:text-surface-0" for="on_label">회사명</label>
       </FloatLabel>
       <FloatLabel variant="on">
@@ -242,7 +237,7 @@
           label-id="on_label"
           option-label="label"
           option-value="value"
-          @update:model-value="execute()" />
+          @update:model-value="search()" />
         <label class="dark:text-surface-0" for="on_label">구분</label>
       </FloatLabel>
       <FloatLabel variant="on">
@@ -256,7 +251,7 @@
           label-id="on_label"
           option-label="name"
           option-value="code"
-          @update:model-value="execute()" />
+          @update:model-value="search()" />
         <label class="dark:text-surface-0" for="on_label">보험사</label>
       </FloatLabel>
       <FloatLabel variant="on">
@@ -268,7 +263,7 @@
           label-id="on_label"
           option-label="label"
           option-value="value"
-          @update:model-value="execute()" />
+          @update:model-value="search()" />
         <label class="dark:text-surface-0" for="on_label">작업구분</label>
       </FloatLabel>
       <FloatLabel variant="on">
@@ -291,7 +286,7 @@
           label-id="on_label"
           option-label="name"
           option-value="code"
-          @update:model-value="execute()" />
+          @update:model-value="search()" />
         <label class="dark:text-surface-0" for="on_label">상태</label>
       </FloatLabel>
       <FloatLabel variant="on">
@@ -303,7 +298,7 @@
           label-id="on_label"
           option-label="label"
           option-value="value"
-          @update:model-value="execute()" />
+          @update:model-value="search()" />
         <label class="dark:text-surface-0" for="on_label">상태코드</label>
       </FloatLabel>
       <FloatLabel variant="on">
@@ -315,7 +310,7 @@
           label-id="on_label"
           option-label="label"
           option-value="value"
-          @update:model-value="execute()" />
+          @update:model-value="search()" />
         <label class="dark:text-surface-0" for="on_label">생성구분</label>
       </FloatLabel>
       <FloatLabel variant="on">
@@ -327,7 +322,7 @@
           label-id="on_label"
           option-label="name"
           option-value="id"
-          @update:model-value="execute()" />
+          @update:model-value="search()" />
         <label class="dark:text-surface-0" for="on_label">작업자</label>
       </FloatLabel>
     </template>
