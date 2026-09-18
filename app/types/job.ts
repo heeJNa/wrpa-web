@@ -49,7 +49,8 @@ const jobSchema = z.object({
   priority: z
     .number('우선순위를 입력해주세요')
     .int()
-    .min(0, '우선순위는 0 이상이어야 합니다'),
+    .min(0, '우선순위는 0 이상이어야 합니다')
+    .max(999, '우선순위는 999 이하여야 합니다 (영업일 순서 밴드 단위)'),
   closingMonthNum: z.number('업적월을 입력해주세요').int(),
   priorityManual: z.boolean().optional(),
   activeBizDayFrom: z.number().int().min(1).max(31).optional().nullable(),
@@ -79,7 +80,8 @@ const manualJobSchema = z.object({
   priority: z
     .number('우선순위를 입력해주세요')
     .int()
-    .min(0, '우선순위는 0 이상이어야 합니다'),
+    .min(0, '우선순위는 0 이상이어야 합니다')
+    .max(999, '우선순위는 999 이하여야 합니다 (영업일 순서 밴드 단위)'),
   closingMonthNum: z.number('업적월을 입력해주세요').int(),
 })
 type ManualJobForm = z.infer<typeof manualJobSchema>

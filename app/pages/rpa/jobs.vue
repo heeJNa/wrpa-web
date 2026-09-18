@@ -514,6 +514,8 @@
             class="w-48"
             v-model="batchUpdatePayload.priority"
             label-id="on_label"
+            :min="0"
+            :max="999"
             fluid>
           </InputNumber>
           <label class="dark:text-surface-0" for="on_label">우선순위</label>
