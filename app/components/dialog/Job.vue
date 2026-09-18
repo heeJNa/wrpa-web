@@ -340,7 +340,7 @@
               :max="99"
               showButtons
               fluid
-              placeholder="비움=전월5/당월무제한, 99=상시" />
+              placeholder="비움=무제한(월말까지)" />
           </template>
         </DialogForm>
       </div>
