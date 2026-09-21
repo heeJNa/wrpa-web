@@ -187,6 +187,47 @@
       })
     }
   }
+
+  const sendingReport = ref(false)
+  const sendDailyReport = () => {
+    confirm.require({
+      message: `${refineWorkDate.value} 작업일 기준 종합상황보고를 텔레그램으로 보낼까요?`,
+      header: '텔레그램 보고 발송',
+      icon: 'pi pi-send',
+      rejectProps: {
+        label: '취소',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptProps: {
+        label: '발송',
+      },
+      accept: () => {
+        sendingReport.value = true
+        request<{ sent: number; workDate: string }>(
+          `/api/monitoring/daily-report?workDate=${refineWorkDate.value}`,
+          { method: 'POST' },
+        ).then(({ data, statusCode }) => {
+          if (statusCode.value === 200) {
+            toast.add({
+              severity: 'success',
+              summary: '성공',
+              detail: `텔레그램 보고 발송 완료 (${data.value?.sent ?? 0}건)`,
+              life: 3000,
+            })
+          } else {
+            toast.add({
+              severity: 'error',
+              summary: '오류',
+              detail: `텔레그램 보고 발송 실패: ${(data.value as any)?.message || '알 수 없는 오류'}`,
+              life: 3000,
+            })
+          }
+          sendingReport.value = false
+        })
+      },
+    })
+  }
 </script>
 <template>
   <ListDataTable
@@ -327,11 +368,21 @@
       </FloatLabel>
     </template>
     <template #toolbar-end>
-      <span class="text-surface-500 dark:text-surface-100 text-lg font-bold">
-        성공 {{ summary?.success || 0 }}건 | 실패 {{ summary?.fail || 0 }}건 | 작업
-        {{ summary?.working || 0 }}건 | 대기 {{ summary?.waiting || 0 }}건 | 취소
-        {{ summary?.cancel || 0 }}건
-      </span>
+      <div class="flex items-center gap-3">
+        <Button
+          type="button"
+          label="텔레그램 보고 발송"
+          icon="pi pi-send"
+          severity="secondary"
+          outlined
+          :loading="sendingReport"
+          @click="sendDailyReport" />
+        <span class="text-surface-500 dark:text-surface-100 text-lg font-bold">
+          성공 {{ summary?.success || 0 }}건 | 실패 {{ summary?.fail || 0 }}건 | 작업
+          {{ summary?.working || 0 }}건 | 대기 {{ summary?.waiting || 0 }}건 | 취소
+          {{ summary?.cancel || 0 }}건
+        </span>
+      </div>
     </template>
     <template #columns>
       <Column class="text-center" field="createTypeSimple" header="생성"> </Column>
