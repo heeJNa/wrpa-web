@@ -99,10 +99,12 @@
         :workers="data.workers"
         :locked-count="lockedCount" />
       <DashboardTrendChart :trend="data.trend" />
-      <DashboardBreakdownCharts
-        :by-company="data.byCompany"
-        :by-insurer="data.byInsurer"
-        :totals="data.totals" />
+      <div class="grid grid-cols-1 gap-4 xl:grid-cols-3">
+        <DashboardFailureReasonChart :failure-reasons="data.failureReasons" />
+        <DashboardWorkerChart :by-worker="data.byWorker" />
+        <DashboardInsurerFailRateChart :by-insurer="data.byInsurer" />
+      </div>
+      <DashboardBreakdownCharts :by-company="data.byCompany" :totals="data.totals" />
       <DashboardIssueTables
         :workers="data.workers"
         :locked-accounts="data.lockedAccounts" />

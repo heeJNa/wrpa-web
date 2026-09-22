@@ -1,4 +1,11 @@
-import type { CompanyStat, InsurerStat, StateCounts, TrendPoint } from '~/types/dashboard'
+import type {
+  CompanyStat,
+  FailureReasonStat,
+  InsurerStat,
+  StateCounts,
+  TrendPoint,
+  WorkerStat,
+} from '~/types/dashboard'
 
 // PrimeVue 테마 토큰과 어울리는 고정 팔레트. 상태 의미색은 화면 어디서나 같게 유지한다
 export const CHART_COLORS = {
@@ -92,6 +99,42 @@ export function insurerFailRateData(byInsurer: InsurerStat[], topN = 10) {
         label: '실패율(%)',
         backgroundColor: CHART_COLORS.fail,
         data: ranked.map((i) => roundPercent(i.counts.failRate)),
+      },
+    ],
+  }
+}
+
+/** 실패 사유별 가로막대(실패 건수). 이미 건수 내림차순 정렬된 입력을 그대로 쓴다 */
+export function failureReasonData(reasons: FailureReasonStat[]) {
+  return {
+    labels: reasons.map((r) => `${r.label} (${r.count})`),
+    datasets: [
+      {
+        label: '실패 건수',
+        backgroundColor: CHART_COLORS.fail,
+        data: reasons.map((r) => r.count),
+      },
+    ],
+  }
+}
+
+/** 작업자별 성공/실패 가로 누적막대 상위 N. 실패 많은 순 → 총건 많은 순으로 정렬 */
+export function workerChartData(byWorker: WorkerStat[], topN = 10) {
+  const ranked = [...byWorker]
+    .sort((a, b) => b.counts.fail - a.counts.fail || b.counts.total - a.counts.total)
+    .slice(0, topN)
+  return {
+    labels: ranked.map((w) => `${w.workerName} (실패 ${w.counts.fail})`),
+    datasets: [
+      {
+        label: '성공',
+        backgroundColor: CHART_COLORS.success,
+        data: ranked.map((w) => w.counts.success),
+      },
+      {
+        label: '실패',
+        backgroundColor: CHART_COLORS.fail,
+        data: ranked.map((w) => w.counts.fail),
       },
     ],
   }

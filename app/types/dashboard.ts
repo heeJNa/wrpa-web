@@ -21,6 +21,18 @@ export interface InsurerStat {
   counts: StateCounts
 }
 
+export interface FailureReasonStat {
+  code: number | null
+  label: string
+  count: number
+}
+
+export interface WorkerStat {
+  workerId: string | null
+  workerName: string
+  counts: StateCounts
+}
+
 export interface WorkerSummary {
   total: number
   ignored: number
@@ -47,6 +59,8 @@ export interface DashboardResponse {
   totals: StateCounts | null
   byCompany: CompanyStat[] | null
   byInsurer: InsurerStat[] | null
+  failureReasons: FailureReasonStat[] | null
+  byWorker: WorkerStat[] | null
   lockedAccounts: CompanyLockedSummary[] | null
   trend: (TrendPoint | null)[]
 }
