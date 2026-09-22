@@ -13,6 +13,8 @@
   const confirm = useConfirm()
   const toast = useToast()
   const sending = ref(false)
+  // 1초마다 갱신되는 generatedAgoSec 틱 때문에 매번 새 Date 를 만들지 않도록 한 번만 생성
+  const today = new Date()
 
   const lockedCount = computed(() =>
     data.value?.lockedAccounts
@@ -67,7 +69,7 @@
         v-model="workDate"
         date-format="yy-mm-dd"
         show-icon
-        :max-date="new Date()" />
+        :max-date="today" />
       <Select class="w-24" v-model="days" :options="[7, 14, 30]" />
       <div class="text-surface-500 flex items-center gap-2 text-xs">
         <ToggleSwitch v-model="autoRefresh" />
@@ -106,9 +108,10 @@
         :locked-accounts="data.lockedAccounts" />
     </template>
     <div class="card text-surface-500 text-sm" v-else-if="loading">불러오는 중…</div>
-    <div class="card text-sm text-red-600" v-else>
-      대시보드를 불러오지 못했습니다. {{ lastError }}
+    <div class="card text-sm text-red-600" v-else-if="lastError">
+      대시보드 {{ lastError }}
     </div>
+    <div class="card text-surface-500 text-sm" v-else>표시할 데이터가 없습니다.</div>
   </div>
   <ConfirmDialog :pt="confirmPT" />
 </template>

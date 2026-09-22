@@ -15,6 +15,11 @@ export function percent(rate: number): string {
   return `${(rate * 100).toFixed(1)}%`
 }
 
+/** 다크 모드 대응 차트 텍스트(범례/눈금/축 제목) 색상 */
+export function chartTextColor(dark: boolean): string {
+  return dark ? '#a1a1aa' : '#3f3f46'
+}
+
 /** 'yyyy-MM-dd' → 'MM-dd' */
 function shortDate(d: string): string {
   return d.slice(5)
@@ -79,7 +84,9 @@ export function insurerFailRateData(byInsurer: InsurerStat[], topN = 10) {
     )
     .slice(0, topN)
   return {
-    labels: ranked.map((i) => i.insurerName),
+    labels: ranked.map(
+      (i) => `${i.insurerName} (${i.counts.fail}/${i.counts.success + i.counts.fail})`,
+    ),
     datasets: [
       {
         label: '실패율(%)',
