@@ -2,6 +2,7 @@
   import type { DataTableRowClickEvent, DataTableSortEvent } from 'primevue/datatable'
   import type { PageState } from 'primevue/paginator'
   import { useJobForm } from '~/composables/forms/useJobForm'
+  import { ACTIVE_BASIS_OPTIONS, type ActiveBasis } from '~/types/active-window'
   import { JobTypesEnum } from '~/types/enum'
   import type { Job, JobBatchUpdatePayload } from '~/types/job'
 
@@ -29,8 +30,9 @@
 
   const batchUpdatePayload = ref<JobBatchUpdatePayload>({
     ids: [],
-    startDate: undefined,
-    endDate: undefined,
+    activeBasis: null,
+    activeFrom: null,
+    activeTo: null,
     workTime: undefined,
     priority: undefined,
     closingMonthNum: undefined,
@@ -43,6 +45,11 @@
     { label: '변경 안 함', value: null },
     { label: '설정', value: true },
     { label: '해제', value: false },
+  ]
+  // 일괄 수정: null은 "변경 안 함"
+  const activeBasisOptions: { label: string; value: ActiveBasis | null }[] = [
+    { label: '변경 안 함', value: null },
+    ...ACTIVE_BASIS_OPTIONS,
   ]
   const comFilterInsuranceCompanyCodes = computed(() => {
     return insuranceCompanyCodes.value.filter((code) => {
@@ -245,8 +252,9 @@
   const clearBatchUpdatePayload = () => {
     batchUpdatePayload.value = {
       ids: [],
-      startDate: undefined,
-      endDate: undefined,
+      activeBasis: null,
+      activeFrom: null,
+      activeTo: null,
       workTime: undefined,
       priority: undefined,
       closingMonthNum: undefined,
@@ -481,22 +489,35 @@
       <div class="flex flex-wrap items-center gap-2">
         <span class="text-lg font-semibold">일괄 수정</span>
         <FloatLabel variant="on">
-          <InputText
-            class="w-48"
-            v-model="batchUpdatePayload.startDate"
+          <Select
+            class="w-40"
+            v-model="batchUpdatePayload.activeBasis"
+            :options="activeBasisOptions"
+            option-label="label"
+            option-value="value"
             label-id="on_label"
-            fluid>
-          </InputText>
-          <label class="dark:text-surface-0" for="on_label">시작일</label>
+            fluid />
+          <label class="dark:text-surface-0" for="on_label">범위 기준</label>
         </FloatLabel>
         <FloatLabel variant="on">
-          <InputText
-            class="w-48"
-            v-model="batchUpdatePayload.endDate"
+          <InputNumber
+            class="w-32"
+            v-model="batchUpdatePayload.activeFrom"
+            :min="1"
+            :max="31"
             label-id="on_label"
-            fluid>
-          </InputText>
-          <label class="dark:text-surface-0" for="on_label">종료일</label>
+            fluid />
+          <label class="dark:text-surface-0" for="on_label">범위 시작</label>
+        </FloatLabel>
+        <FloatLabel variant="on">
+          <InputNumber
+            class="w-32"
+            v-model="batchUpdatePayload.activeTo"
+            :min="1"
+            :max="31"
+            label-id="on_label"
+            fluid />
+          <label class="dark:text-surface-0" for="on_label">범위 종료</label>
         </FloatLabel>
         <FloatLabel variant="on">
           <InputText
@@ -603,9 +624,17 @@
       <Column class="text-center" header="일정">
         <template #body="slotProps">
           <span
-            >{{ slotProps.data?.startDate }} ~ {{ slotProps.data?.endDate }},
+            >{{ slotProps.data?.activeWindowPretty }},
             {{ slotProps.data?.workTime }}</span
           >
+          <Tag
+            class="ml-1"
+            v-if="slotProps.data?.legacyWindowConflict"
+            v-tooltip.top="
+              '예전 일자 범위와 영업일 범위가 둘 다 설정돼 있어 일자 범위로 동작 중입니다. 열어서 기준을 확정하세요.'
+            "
+            value="범위 확인"
+            severity="danger" />
         </template>
       </Column>
       <Column class="text-center" field="closingMonthNum" header="업적월"> </Column>
