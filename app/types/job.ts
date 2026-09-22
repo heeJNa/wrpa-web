@@ -55,6 +55,7 @@ const jobSchema = z.object({
   priorityManual: z.boolean().optional(),
   activeBizDayFrom: z.number().int().min(1).max(31).optional().nullable(),
   activeBizDayTo: z.number().int().min(1).max(99).optional().nullable(),
+  excludeHoliday: z.boolean().optional(),
   note: z
     .string()
     .max(200, '노트는 최대 200자까지 입력할 수 있습니다')
@@ -95,6 +96,7 @@ interface JobBatchUpdatePayload {
   closingMonthNum?: number
   timeout?: number
   locked?: boolean
+  excludeHoliday?: boolean | null
 }
 
 interface JobBatchCopyPayload {

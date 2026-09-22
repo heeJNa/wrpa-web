@@ -36,7 +36,14 @@
     closingMonthNum: undefined,
     timeout: undefined,
     locked: false,
+    excludeHoliday: null,
   })
+  // 일괄 수정: null은 "변경 안 함" (백엔드가 null이면 기존값 유지)
+  const excludeHolidayOptions = [
+    { label: '변경 안 함', value: null },
+    { label: '설정', value: true },
+    { label: '해제', value: false },
+  ]
   const comFilterInsuranceCompanyCodes = computed(() => {
     return insuranceCompanyCodes.value.filter((code) => {
       return !insuranceCompanyType.value || code.type === insuranceCompanyType.value
@@ -242,6 +249,7 @@
       priority: undefined,
       closingMonthNum: undefined,
       timeout: undefined,
+      excludeHoliday: null,
     }
   }
 
@@ -531,6 +539,17 @@
         </FloatLabel>
         <Checkbox v-model="batchUpdatePayload.locked" inputId="locked" binary />
         <label for="locked"> 잠금 </label>
+        <FloatLabel variant="on">
+          <Select
+            class="w-40"
+            v-model="batchUpdatePayload.excludeHoliday"
+            :options="excludeHolidayOptions"
+            option-label="label"
+            option-value="value"
+            label-id="on_label"
+            fluid />
+          <label class="dark:text-surface-0" for="on_label">휴일제외</label>
+        </FloatLabel>
       </div>
     </template>
     <template #toolbar-end>
@@ -593,6 +612,14 @@
         <template #body="slotProps">
           <Tag v-if="slotProps.data.priorityManual" value="수동" severity="warning" />
           <Tag v-else value="자동" severity="info" />
+        </template>
+      </Column>
+      <Column class="text-center" field="excludeHoliday" header="휴일제외">
+        <template #body="slotProps">
+          <Tag
+            v-if="slotProps.data.excludeHoliday"
+            value="휴일제외"
+            severity="secondary" />
         </template>
       </Column>
       <Column class="text-right" field="lifetime" header="Timeout(ms)"> </Column>

@@ -314,6 +314,20 @@
           </template>
         </DialogForm>
         <DialogForm
+          class="flex-auto text-center"
+          label="휴일제외"
+          :error="errors?.excludeHoliday">
+          <template #input>
+            <div
+              class="flex h-full items-center justify-center"
+              v-tooltip.top="
+                '주말·공휴일(휴일관리)에는 작업을 생성하지 않습니다. 즉시 생성에는 적용되지 않습니다.'
+              ">
+              <Checkbox id="excludeHoliday" v-model="jobForm.excludeHoliday" binary />
+            </div>
+          </template>
+        </DialogForm>
+        <DialogForm
           class="flex-1/3"
           label="유효 영업일 시작"
           :error="errors?.activeBizDayFrom">

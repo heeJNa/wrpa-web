@@ -27,6 +27,7 @@ export const useJobForm = () => {
     priorityManual: false,
     activeBizDayFrom: null,
     activeBizDayTo: null,
+    excludeHoliday: false,
     note: undefined,
   })
   const { errors, validate } = useFormValidator(jobSchema, () => ({
@@ -48,6 +49,7 @@ export const useJobForm = () => {
     priorityManual: jobForm.value.priorityManual,
     activeBizDayFrom: jobForm.value.activeBizDayFrom,
     activeBizDayTo: jobForm.value.activeBizDayTo,
+    excludeHoliday: jobForm.value.excludeHoliday,
     note: jobForm.value.note,
   }))
 
