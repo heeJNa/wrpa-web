@@ -9,7 +9,7 @@
   </div>
 </template>
 <script setup lang="ts">
-  const { insuranceCompanyCodes, teams } = useGlobalData()
+  const { insuranceCompanyCodes, teams, refreshTeams } = useGlobalData()
   const { request } = useClientAPI()
   const { isLogin } = storeToRefs(useAuthStore())
 
@@ -22,8 +22,7 @@
         insuranceCompanyCodes.value = data.value || []
       }
       if (teams.value.length === 0) {
-        const { data } = await request<any[]>('/api/auth/teams')
-        teams.value = data.value || []
+        await refreshTeams()
       }
     }
   })

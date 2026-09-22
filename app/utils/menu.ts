@@ -17,6 +17,7 @@ export const menus: MenuItem[] = [
   {
     label: 'Management',
     items: [
+      { label: '회사', icon: 'pi pi-fw pi-building', to: '/management/companies' },
       { label: '팩토리', icon: 'pi pi-fw pi-book', to: '/management/factories' },
       { label: '계정', icon: 'pi pi-fw pi-users', to: '/management/accounts' },
       { label: '패키지', icon: 'pi pi-fw pi-box', to: '/management/packages' },
