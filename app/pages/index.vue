@@ -83,11 +83,11 @@
     </div>
 
     <template v-if="data">
+      <!-- 오늘 요약 → 지금 돌고 있나 → 왜·어디서 → 지금 조치할 것 → 책임 구분·추세 -->
       <DashboardKpiTiles
         :totals="data.totals"
         :workers="data.workers"
         :locked-count="lockedCount" />
-      <DashboardTrendChart :trend="data.trend" />
       <DashboardHourlyProgressChart
         :hourly="data.hourly"
         :day-total="data.totals?.total ?? null" />
@@ -96,10 +96,13 @@
         <DashboardWorkerChart :by-worker="data.byWorker" />
         <DashboardInsurerFailRateChart :by-insurer="data.byInsurer" />
       </div>
-      <DashboardBreakdownCharts :by-company="data.byCompany" :totals="data.totals" />
       <DashboardIssueTables
         :workers="data.workers"
         :locked-accounts="data.lockedAccounts" />
+      <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
+        <DashboardCompanyChart :by-company="data.byCompany" />
+        <DashboardTrendChart :trend="data.trend" />
+      </div>
     </template>
     <div class="card text-surface-500 text-sm" v-else-if="loading">불러오는 중…</div>
     <div class="card text-sm text-red-600" v-else-if="lastError">

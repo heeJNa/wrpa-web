@@ -239,21 +239,3 @@ export function hourlyProgressData(hourly: HourlyPoint[], dayTotal: number | nul
   }
 }
 
-/** 오늘 상태 분포 도넛. 0 인 버킷은 뺀다 */
-export function stateDonutData(totals: StateCounts) {
-  const buckets: [string, number, string][] = [
-    ['성공', totals.success, CHART_COLORS.success],
-    ['실패', totals.fail, CHART_COLORS.fail],
-    ['대기', totals.waiting, CHART_COLORS.waiting],
-    ['작업중', totals.working, CHART_COLORS.working],
-    ['취소', totals.cancel, CHART_COLORS.cancel],
-    ['기타', totals.etc, CHART_COLORS.etc],
-  ]
-  const shown = buckets.filter(([, n]) => n > 0)
-  return {
-    labels: shown.map(([l]) => l),
-    datasets: [
-      { data: shown.map(([, n]) => n), backgroundColor: shown.map(([, , c]) => c) },
-    ],
-  }
-}
