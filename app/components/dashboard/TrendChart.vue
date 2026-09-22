@@ -2,7 +2,7 @@
   import type { TrendPoint } from '~/types/dashboard'
   import { chartTextColor, trendChartData } from '~/utils/dashboardChart'
 
-  const props = defineProps<{ trend: (TrendPoint | null)[]; days: number }>()
+  const props = defineProps<{ trend: (TrendPoint | null)[] }>()
   const { isDarkTheme } = useLayout()
 
   const chartData = computed(() => trendChartData(props.trend ?? []))

@@ -98,7 +98,7 @@
         :totals="data.totals"
         :workers="data.workers"
         :locked-count="lockedCount" />
-      <DashboardTrendChart :trend="data.trend" :days="days" />
+      <DashboardTrendChart :trend="data.trend" />
       <DashboardBreakdownCharts
         :by-company="data.byCompany"
         :by-insurer="data.byInsurer"

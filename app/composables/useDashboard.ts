@@ -1,3 +1,4 @@
+import { useToast } from 'primevue/usetoast'
 import type { DashboardResponse } from '~/types/dashboard'
 
 const POLL_MS = 60_000
@@ -5,8 +6,12 @@ const POLL_MS = 60_000
 /**
  * 대시보드 데이터. 실패해도 마지막 성공 응답을 유지하고 lastError 만 남긴다.
  * 폴링 갱신에서 전역 오류 토스트가 뜨지 않도록 useClientAPI() 대신 $fetch 를 직접 쓴다.
+ * 단, 401/403(세션 만료)은 토스트를 억제하는 대상이 아니라 useClientAPI 가 쓰는 것과
+ * 동일한 errorHandler 로 넘겨 로그인 화면으로 보낸다.
  */
 export function useDashboard() {
+  const nuxtApp = useNuxtApp()
+  const toast = useToast()
   const workDate = ref<Date>(new Date())
   const days = ref(30)
   const data = ref<DashboardResponse | null>(null)
@@ -33,8 +38,18 @@ export function useDashboard() {
       if (seq !== requestSeq) return
       data.value = res
       lastError.value = null
-    } catch {
+    } catch (err) {
       if (seq !== requestSeq) return
+      const status =
+        (err as { statusCode?: number; response?: { status?: number } })?.statusCode ??
+        (err as { response?: { status?: number } })?.response?.status
+      if (status === 401 || status === 403) {
+        // 갱신 토큰이 만료·폐기됨 — useClientAPI 의 전역 onFetchError 와 동일하게
+        // 세션을 정리하고 로그인으로 보낸 뒤 더 이상 조용히 폴링하지 않는다.
+        stopPolling()
+        await errorHandler(nuxtApp, toast, status)
+        return
+      }
       lastError.value = `갱신 실패 (${formatToKoreanTime(new Date(), 'HH:mm')})`
     } finally {
       if (seq === requestSeq) {
