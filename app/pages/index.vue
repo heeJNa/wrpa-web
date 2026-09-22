@@ -52,9 +52,10 @@
         :totals="data.totals"
         :workers="data.workers"
         :locked-count="lockedCount" />
+      <!-- 취소된 작업은 끝나기를 기다리는 물량이 아니므로 잔량 분모에서 뺀다 -->
       <DashboardHourlyProgressChart
         :hourly="data.hourly"
-        :day-total="data.totals?.total ?? null" />
+        :day-total="data.totals ? data.totals.total - data.totals.cancel : null" />
       <div class="grid grid-cols-1 gap-4 xl:grid-cols-3">
         <DashboardFailureReasonChart :failure-reasons="data.failureReasons" />
         <DashboardWorkerChart :by-worker="data.byWorker" />
