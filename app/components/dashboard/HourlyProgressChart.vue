@@ -44,7 +44,7 @@
 </script>
 
 <template>
-  <div class="card flex flex-col" :class="chartData && chartData.labels.length ? 'h-80' : ''">
+  <div class="card !mb-0 flex flex-col" :class="chartData && chartData.labels.length ? 'h-80' : ''">
     <h3 class="mb-2 text-sm font-semibold">시간대별 처리량 · 미완료 잔량</h3>
     <Chart
       class="min-h-0 flex-1"

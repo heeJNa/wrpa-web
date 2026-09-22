@@ -16,7 +16,7 @@
 
 <template>
   <div class="flex flex-col gap-5 pb-10">
-    <div class="card -mb-3 flex flex-wrap items-center gap-x-4 gap-y-3">
+    <div class="card !mb-0 flex flex-wrap items-center gap-x-4 gap-y-3">
       <h2 class="text-lg font-semibold">RPA 대시보드</h2>
       <div class="flex items-center gap-2">
         <label class="text-surface-500 text-sm" for="dashboard-work-date">기준일</label>

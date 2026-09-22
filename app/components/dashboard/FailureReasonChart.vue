@@ -30,7 +30,7 @@
 </script>
 
 <template>
-  <div class="card mb-0 flex flex-col" :class="reasons && reasons.labels.length ? 'h-96' : ''">
+  <div class="card !mb-0 flex flex-col" :class="reasons && reasons.labels.length ? 'h-96' : ''">
     <h3 class="mb-2 text-sm font-semibold">실패 사유</h3>
     <Chart
       class="min-h-0 flex-1"

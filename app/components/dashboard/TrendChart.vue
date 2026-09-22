@@ -38,7 +38,7 @@
 </script>
 
 <template>
-  <div class="card mb-0 flex flex-col" :class="chartData && chartData.labels.length ? 'h-96' : ''">
+  <div class="card !mb-0 flex flex-col" :class="chartData && chartData.labels.length ? 'h-96' : ''">
     <div class="mb-2 flex items-center justify-between">
       <h3 class="text-sm font-semibold">최근 {{ trend.length }}일 성공 · 실패 · 실패율</h3>
       <span class="text-surface-500 text-xs" v-if="trend.some((p) => p === null)"

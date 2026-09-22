@@ -24,7 +24,7 @@
 
 <template>
   <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
-    <div class="card mb-0 h-full">
+    <div class="card !mb-0 h-full">
       <div class="mb-2 flex items-center justify-between">
         <h3 class="text-sm font-semibold">응답 없는 작업자 (현재)</h3>
         <NuxtLink class="text-primary text-xs" to="/rpa/workers">작업자 관리 →</NuxtLink>
@@ -35,7 +35,7 @@
         <Column field="name" header="작업자" />
       </DataTable>
     </div>
-    <div class="card mb-0 h-full">
+    <div class="card !mb-0 h-full">
       <div class="mb-2 flex items-center justify-between">
         <h3 class="text-sm font-semibold">잠긴 계정 (현재)</h3>
         <NuxtLink class="text-primary text-xs" to="/management/accounts"

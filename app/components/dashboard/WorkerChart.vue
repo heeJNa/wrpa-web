@@ -32,7 +32,7 @@
 </script>
 
 <template>
-  <div class="card mb-0 flex flex-col" :class="worker && worker.labels.length ? 'h-96' : ''">
+  <div class="card !mb-0 flex flex-col" :class="worker && worker.labels.length ? 'h-96' : ''">
     <h3 class="mb-2 text-sm font-semibold">작업자별 처리량 · 실패 상위 10</h3>
     <Chart
       class="min-h-0 flex-1"

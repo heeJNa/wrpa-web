@@ -46,7 +46,7 @@
 
 <template>
   <div
-    class="card mb-0 flex flex-col"
+    class="card !mb-0 flex flex-col"
     :class="company && company.labels.length ? 'h-96' : ''">
     <h3 class="mb-2 text-sm font-semibold">회사별 성공 / 실패</h3>
     <Chart
