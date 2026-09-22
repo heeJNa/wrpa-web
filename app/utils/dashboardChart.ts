@@ -162,9 +162,15 @@ export function failureReasonData(reasons: FailureReasonStat[]) {
   }
 }
 
-/** 작업자별 성공/실패 가로 누적막대 상위 N. 실패 많은 순 → 총건 많은 순으로 정렬 */
+/**
+ * 작업자별 성공/실패 가로 누적막대 상위 N. 실패 많은 순 → 총건 많은 순으로 정렬.
+ * 끝난 작업이 하나도 없는 항목은 뺀다 — 특히 [미할당](작업자 ID 가 없어 실행된 적 없는
+ * 대기·취소 건)은 항상 0 이라 막대 없는 빈 줄로 상위 N 자리만 차지한다.
+ * 반대로 작업자 문서가 지워져 [미할당]로 묶였지만 실제 실적이 있는 경우는 그대로 보인다.
+ */
 export function workerChartData(byWorker: WorkerStat[], topN = 10) {
   const ranked = [...byWorker]
+    .filter((w) => w.counts.success + w.counts.fail > 0)
     .sort((a, b) => b.counts.fail - a.counts.fail || b.counts.total - a.counts.total)
     .slice(0, topN)
   return {
