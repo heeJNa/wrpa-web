@@ -1,41 +1,114 @@
-<script setup>
-  const onThrow = () => {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'This is a test error',
-      fatal: true,
+<script setup lang="ts">
+  const {
+    workDate,
+    days,
+    data,
+    loading,
+    lastError,
+    autoRefresh,
+    refresh,
+    generatedAgoSec,
+  } = useDashboard()
+  const { request } = useClientAPI()
+  const confirm = useConfirm()
+  const toast = useToast()
+  const sending = ref(false)
+
+  const lockedCount = computed(() =>
+    data.value?.lockedAccounts
+      ? data.value.lockedAccounts.reduce(
+          (n, c) => n + c.insurers.reduce((m, i) => m + i.second, 0),
+          0,
+        )
+      : null,
+  )
+
+  const sendReport = () => {
+    confirm.require({
+      header: '텔레그램 보고 발송',
+      message: `${formatToKoreanTime(workDate.value, 'YYYY-MM-DD')} 종합상황보고를 지금 보낼까요?`,
+      icon: 'pi pi-send',
+      acceptProps: { label: '발송' },
+      rejectProps: { label: '취소', severity: 'secondary', outlined: true },
+      accept: () => {
+        sending.value = true
+        request<{ sent: number; workDate: string }>(
+          `/api/monitoring/daily-report?workDate=${formatToKoreanTime(workDate.value, 'YYYY-MM-DD')}`,
+          { method: 'POST' },
+        ).then(({ data: res, statusCode }) => {
+          if (statusCode.value === 200) {
+            toast.add({
+              severity: 'success',
+              summary: '성공',
+              detail: `텔레그램 보고 발송 완료 (${res.value?.sent ?? 0}건)`,
+              life: 3000,
+            })
+          } else {
+            toast.add({
+              severity: 'error',
+              summary: '실패',
+              detail: '텔레그램 보고 발송에 실패했습니다.',
+              life: 5000,
+            })
+          }
+          sending.value = false
+        })
+      },
     })
   }
 </script>
 
 <template>
-  <div class="card">
-    <h2>Main page</h2>
-    <div class="my-8 flex flex-col gap-6">
-      <h4>Nuxt - Vue Pages</h4>
-      <div class="flex w-1/6 flex-wrap gap-6">
-        <!-- <Button
-          severity="contrast"
-          as="router-link"
-          to="/not-found"
-          label="Not Found Page" /> -->
-        <Button label="Throw Error" severity="danger" @click="onThrow" />
+  <div class="flex flex-col gap-4">
+    <div class="card flex flex-wrap items-center gap-3">
+      <h2 class="mr-auto text-lg font-semibold">RPA 대시보드</h2>
+      <DatePicker
+        class="w-40"
+        v-model="workDate"
+        date-format="yy-mm-dd"
+        show-icon
+        :max-date="new Date()" />
+      <Select class="w-24" v-model="days" :options="[7, 14, 30]" />
+      <div class="text-surface-500 flex items-center gap-2 text-xs">
+        <ToggleSwitch v-model="autoRefresh" />
+        <span>60초 자동갱신</span>
+        <span v-if="generatedAgoSec !== null"
+          >· {{ generatedAgoSec }}초 전 집계<span v-if="data?.cached"> (캐시)</span></span
+        >
+        <span class="text-red-600" v-if="lastError">· {{ lastError }}</span>
       </div>
-      <h4 class="mt-10">Auth Pages</h4>
+      <Button
+        label="새로고침"
+        icon="pi pi-refresh"
+        severity="secondary"
+        outlined
+        :loading="loading"
+        @click="refresh" />
+      <Button
+        label="텔레그램 발송"
+        icon="pi pi-send"
+        :loading="sending"
+        @click="sendReport" />
+    </div>
 
-      <div class="flex w-1/6 flex-wrap gap-6">
-        <Button
-          severity="warn"
-          as="router-link"
-          to="/auth/access"
-          label="Unauthorized Page" />
-        <Button as="router-link" to="/login" label="Login Page" />
-      </div>
-      <h4 class="mt-10">Global Datas</h4>
-
-      <div class="flex w-1/6 flex-wrap gap-6">
-        <!-- {{ insuranceCompanyCodes.map((code) => code.name).join(', ') }} -->
-      </div>
+    <template v-if="data">
+      <DashboardKpiTiles
+        :totals="data.totals"
+        :workers="data.workers"
+        :locked-count="lockedCount" />
+      <DashboardTrendChart :trend="data.trend" :days="days" />
+      <DashboardBreakdownCharts
+        :by-company="data.byCompany"
+        :by-insurer="data.byInsurer"
+        :totals="data.totals" />
+      <DashboardIssueTables
+        :workers="data.workers"
+        :locked-accounts="data.lockedAccounts" />
+    </template>
+    <div class="card text-surface-500 text-sm" v-else-if="loading">불러오는 중…</div>
+    <div class="card text-sm text-red-600" v-else>
+      대시보드를 불러오지 못했습니다. {{ lastError }}
     </div>
   </div>
+  <ConfirmDialog :pt="confirmPT" />
 </template>
