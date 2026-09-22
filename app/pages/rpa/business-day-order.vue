@@ -116,7 +116,12 @@
         { updateDataOnError: true },
       )
       if (statusCode.value === 200) {
-        toast.add({ severity: 'success', summary: '성공', detail: '저장되었습니다.', life: 3000 })
+        toast.add({
+          severity: 'success',
+          summary: '성공',
+          detail: '저장되었습니다.',
+          life: 3000,
+        })
         await loadScope()
       } else {
         toast.add({
@@ -133,10 +138,10 @@
 </script>
 
 <template>
-  <div class="flex flex-col gap-4 p-4">
+  <div class="flex flex-col gap-3">
     <div>
-      <h2 class="text-xl font-semibold">영업일 순서정책</h2>
-      <p class="text-surface-500 text-sm">
+      <h2 class="text-2xl font-semibold">영업일 순서정책</h2>
+      <p class="text-surface-500">
         영업일 구간별로 업로드 카테고리의 실행 순서를 정합니다. 순서만 정하며, 작업 생성
         여부는 작업일정의 유효 영업일 범위가 결정합니다.
       </p>
@@ -169,17 +174,17 @@
     </div>
 
     <template v-if="companyId">
-      <div class="flex flex-col gap-1 rounded border p-3">
+      <div class="flex flex-col gap-1 rounded border px-3 py-2">
         <div class="flex items-center gap-2">
           <ToggleSwitch v-model="enabled" input-id="enabled" @change="onToggleEnabled" />
           <label for="enabled">이 회사에 영업일 순서 사용</label>
         </div>
-        <small class="text-surface-500" v-if="!enabled">
+        <span class="text-surface-500 text-base" v-if="!enabled">
           OFF: 기존 작업 동작 그대로 (정책은 저장만 되고 적용되지 않음)
-        </small>
-        <small class="text-orange-600" v-else>
+        </span>
+        <span class="text-base text-orange-600" v-else>
           ON: 이 회사의 자동 생성 작업에 정책이 적용됩니다.
-        </small>
+        </span>
       </div>
 
       <Message
@@ -197,8 +202,8 @@
         회사 기본 정책이 아직 저장되지 않았습니다(기본 시드 표시 중).
       </Message>
       <template v-if="!insuranceCompanyCode && savedPolicies.length">
-        <h3 class="mt-2 font-medium">저장된 정책</h3>
-        <div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+        <h3 class="mt-1 text-xl font-semibold">저장된 정책</h3>
+        <div class="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
           <BusinessDayOrderPolicyCard
             v-for="p in savedPolicies"
             :key="p.code ?? '__default'"
@@ -207,7 +212,7 @@
             :editing="p.code === null"
             @edit="editPolicy(p.code)" />
         </div>
-        <h3 class="mt-2 font-medium">회사 기본 정책 편집</h3>
+        <h3 class="mt-1 text-xl font-semibold">회사 기본 정책 편집</h3>
       </template>
 
       <BusinessDayOrderRow

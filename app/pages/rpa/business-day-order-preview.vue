@@ -76,10 +76,10 @@
 </script>
 
 <template>
-  <div class="flex flex-col gap-4 p-4">
+  <div class="flex flex-col gap-3">
     <div>
-      <h2 class="text-xl font-semibold">순서 미리보기 (시뮬레이션)</h2>
-      <p class="text-surface-500 text-sm">
+      <h2 class="text-2xl font-semibold">순서 미리보기 (시뮬레이션)</h2>
+      <p class="text-surface-500">
         선택한 회사·날짜에 자동 생성될 작업과 그 실행 순서를 시뮬레이션합니다. 실제 작업은
         생성되지 않습니다.
       </p>
@@ -103,13 +103,13 @@
 
     <template v-if="result">
       <div class="flex flex-wrap items-center gap-3">
-        <span class="font-medium"
+        <span class="text-xl font-semibold"
           >{{ result.date }} = {{ result.businessDay }}영업일</span
         >
         <Tag
           :value="result.enabled ? '순서 사용' : '순서 미사용'"
           :severity="result.enabled ? 'success' : 'secondary'" />
-        <span class="text-surface-500 text-sm">
+        <span class="text-surface-500">
           생성 {{ result.rows.length }}건 · 스킵 {{ result.skippedRows?.length ?? 0 }}건
         </span>
       </div>
@@ -125,7 +125,6 @@
       <DataTable
         :value="orderedRows"
         data-key="jobId"
-        size="small"
         show-gridlines
         striped-rows
         sort-field="executionOrder"

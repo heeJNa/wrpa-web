@@ -20,14 +20,11 @@
     <div class="flex items-center justify-between gap-2">
       <span class="font-semibold">{{ title }}</span>
       <Tag v-if="editing" value="편집 중" severity="info" />
-      <Button v-else label="편집" size="small" text @click="emit('edit')" />
+      <Button v-else label="편집" text @click="emit('edit')" />
     </div>
-    <div class="text-surface-500 text-sm" v-if="rows.length === 0">구간 없음</div>
-    <div
-      class="flex flex-wrap items-baseline gap-x-2 text-sm"
-      v-for="(r, i) in rows"
-      :key="i">
-      <span class="text-surface-500 w-28 shrink-0">{{ rangeLabel(r) }}</span>
+    <div class="text-surface-500" v-if="rows.length === 0">구간 없음</div>
+    <div class="flex flex-wrap items-baseline gap-x-2" v-for="(r, i) in rows" :key="i">
+      <span class="text-surface-500 w-32 shrink-0">{{ rangeLabel(r) }}</span>
       <span class="text-surface-400" v-if="r.order.length === 0">(비어 있음)</span>
       <span v-else>{{ r.order.map(categoryLabel).join(' → ') }}</span>
     </div>

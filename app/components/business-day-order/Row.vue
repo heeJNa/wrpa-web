@@ -35,15 +35,17 @@
 </script>
 
 <template>
-  <div class="flex flex-col gap-3 rounded border p-3" :class="invalid ? 'border-red-400 bg-red-50/30' : ''">
+  <div
+    class="flex flex-col gap-2 rounded border p-3"
+    :class="invalid ? 'border-red-400 bg-red-50/30' : ''">
     <div class="flex flex-wrap items-center gap-3">
-      <span class="font-medium">{{ index + 1 }}번째 구간</span>
+      <span class="font-semibold">{{ index + 1 }}번째 구간</span>
       <label class="flex items-center gap-2">
         <span>시작 영업일</span>
         <InputNumber
           class="w-20"
-          input-class="w-full"
           v-model="row.bizDayFrom"
+          input-class="w-full"
           :min="1"
           :max="31"
           :use-grouping="false" />
@@ -52,8 +54,8 @@
         <span>종료 영업일</span>
         <InputNumber
           class="w-20"
-          input-class="w-full"
           v-model="row.bizDayTo"
+          input-class="w-full"
           :min="1"
           :max="99"
           :use-grouping="false"
@@ -66,7 +68,6 @@
       <Button
         class="ml-auto"
         label="구간 삭제"
-        size="small"
         severity="danger"
         text
         @click="emit('remove')" />
@@ -74,7 +75,7 @@
 
     <div class="flex max-w-3xl flex-col gap-1">
       <div
-        class="bg-surface-50 flex items-center gap-2 rounded px-2 py-1"
+        class="bg-surface-50 flex items-center gap-2 rounded px-2 py-0.5"
         v-for="(value, i) in row.order"
         :key="value">
         <span class="w-6 text-right font-mono">{{ i + 1 }}</span>
@@ -93,7 +94,7 @@
           @click="move(i, 1)" />
         <Button label="제외" size="small" severity="secondary" text @click="exclude(i)" />
       </div>
-      <div class="text-surface-500 px-2 py-1 text-sm" v-if="row.order.length === 0">
+      <div class="text-surface-500 px-2 py-1" v-if="row.order.length === 0">
         포함된 카테고리가 없습니다. 이 구간의 모든 작업은 작업일정의 우선순위를 그대로
         사용합니다.
       </div>
@@ -105,11 +106,10 @@
           option-label="label"
           option-value="value"
           placeholder="카테고리 추가"
-          size="small"
           @update:model-value="include" />
-        <small class="text-surface-500"
+        <span class="text-surface-500 text-base"
           >제외된 카테고리: {{ excluded.map((c) => c.label).join(', ') }} — 이 구간에서는
-          맨 뒤(가장 낮은 우선순위)로 처리됩니다.</small
+          맨 뒤(가장 낮은 우선순위)로 처리됩니다.</span
         >
       </div>
     </div>
