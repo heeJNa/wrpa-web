@@ -36,7 +36,13 @@
   <div class="grid grid-cols-1 gap-4 xl:grid-cols-3">
     <div class="card h-80">
       <h3 class="mb-2 text-sm font-semibold">회사별 성공 / 실패</h3>
-      <Chart class="h-64" v-if="company" type="bar" :data="company" :options="stacked" />
+      <Chart
+        class="h-64"
+        v-if="company && company.labels.length"
+        type="bar"
+        :data="company"
+        :options="stacked" />
+      <p class="text-surface-500 text-sm" v-else-if="company">작업 없음</p>
       <p class="text-surface-500 text-sm" v-else>(조회 실패)</p>
     </div>
     <div class="card h-80">
