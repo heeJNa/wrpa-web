@@ -76,32 +76,38 @@
 </script>
 
 <template>
-  <div class="flex flex-col gap-3">
-    <div>
-      <h2 class="text-2xl font-semibold">순서 미리보기 (시뮬레이션)</h2>
-      <p class="text-surface-500">
-        선택한 회사·날짜에 자동 생성될 작업과 그 실행 순서를 시뮬레이션합니다. 실제 작업은
-        생성되지 않습니다.
-      </p>
+  <div class="flex h-full flex-col gap-3 overflow-hidden">
+    <div class="card !mb-0 !p-4">
+      <div class="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 class="text-2xl font-semibold">순서 미리보기 (시뮬레이션)</h2>
+          <p class="text-surface-500">
+            선택한 회사·날짜에 자동 생성될 작업과 그 실행 순서를 시뮬레이션합니다. 실제
+            작업은 생성되지 않습니다.
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <Select
+            class="w-56"
+            v-model="companyId"
+            :options="teams"
+            option-label="name"
+            option-value="id"
+            placeholder="회사 선택"
+            showClear
+            filter />
+          <DatePicker class="w-40" v-model="date" date-format="yy-mm-dd" show-icon />
+          <Button
+            label="미리보기"
+            icon="pi pi-search"
+            :loading="loading"
+            :disabled="!companyId || !date"
+            @click="preview" />
+        </div>
+      </div>
     </div>
 
-    <div class="flex flex-wrap items-center gap-3">
-      <Select
-        v-model="companyId"
-        :options="teams"
-        option-label="name"
-        option-value="id"
-        placeholder="회사 선택"
-        showClear />
-      <DatePicker class="w-44" v-model="date" date-format="yy-mm-dd" show-icon />
-      <Button
-        label="미리보기"
-        :loading="loading"
-        :disabled="!companyId || !date"
-        @click="preview" />
-    </div>
-
-    <template v-if="result">
+    <div class="card !mb-0 flex min-h-0 flex-1 flex-col gap-3 !p-4" v-if="result">
       <div class="flex flex-wrap items-center gap-3">
         <span class="text-xl font-semibold"
           >{{ result.date }} = {{ result.businessDay }}영업일</span
@@ -123,16 +129,20 @@
       </Message>
 
       <DataTable
+        class="min-h-0 flex-1"
         :value="orderedRows"
         data-key="jobId"
+        scrollable
+        scroll-height="flex"
         show-gridlines
         striped-rows
+        row-hover
         sort-field="executionOrder"
         :sort-order="1"
         removable-sort>
         <template #empty>생성될 작업이 없습니다.</template>
         <Column
-          class="w-20 text-center"
+          class="w-28 text-center whitespace-nowrap"
           field="executionOrder"
           header="실행순서"
           sortable />
@@ -144,18 +154,26 @@
         <Column class="text-center" header="카테고리">
           <template #body="{ data }">{{ categoryOrJobType(data) }}</template>
         </Column>
-        <Column class="text-center" field="startAfter" header="시작시각" sortable>
+        <Column
+          class="text-center whitespace-nowrap"
+          field="startAfter"
+          header="시작시각"
+          sortable>
           <template #body="{ data }">{{
             data.startAfter ?? data.workTime ?? '-'
           }}</template>
         </Column>
-        <Column class="text-right" field="priority" header="우선순위" sortable></Column>
+        <Column
+          class="w-28 text-center whitespace-nowrap"
+          field="priority"
+          header="우선순위"
+          sortable />
         <Column class="w-20 text-center" header="수동">
           <template #body="{ data }">
             <Tag v-if="data.manual" value="수동" severity="warn" />
           </template>
         </Column>
       </DataTable>
-    </template>
+    </div>
   </div>
 </template>

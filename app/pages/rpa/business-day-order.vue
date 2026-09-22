@@ -139,54 +139,62 @@
 
 <template>
   <div class="flex flex-col gap-3">
-    <div>
-      <h2 class="text-2xl font-semibold">영업일 순서정책</h2>
-      <p class="text-surface-500">
-        영업일 구간별로 업로드 카테고리의 실행 순서를 정합니다. 순서만 정하며, 작업 생성
-        여부는 작업일정의 유효 영업일 범위가 결정합니다.
-      </p>
-    </div>
+    <div class="card !mb-0 flex flex-col gap-3 !p-4">
+      <div class="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 class="text-2xl font-semibold">영업일 순서정책</h2>
+          <p class="text-surface-500">
+            영업일 구간별로 업로드 카테고리의 실행 순서를 정합니다. 순서만 정하며, 작업
+            생성 여부는 작업일정의 유효 영업일 범위가 결정합니다.
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <Select
+            class="w-56"
+            v-model="companyId"
+            :options="teams"
+            option-label="name"
+            option-value="id"
+            placeholder="회사 선택"
+            showClear
+            filter
+            @change="loadScope" />
+          <Select
+            class="w-56"
+            v-model="insuranceCompanyCode"
+            :options="insuranceCompanyCodes"
+            option-label="name"
+            option-value="code"
+            placeholder="보험사(비우면 회사 기본)"
+            showClear
+            filter
+            @change="loadScope" />
+          <Button
+            label="불러오기"
+            icon="pi pi-refresh"
+            severity="secondary"
+            :disabled="!companyId"
+            @click="loadScope" />
+        </div>
+      </div>
 
-    <div class="flex flex-wrap items-center gap-3">
-      <Select
-        v-model="companyId"
-        :options="teams"
-        option-label="name"
-        option-value="id"
-        placeholder="회사 선택"
-        showClear
-        @change="loadScope" />
-      <Select
-        v-model="insuranceCompanyCode"
-        :options="insuranceCompanyCodes"
-        option-label="name"
-        option-value="code"
-        placeholder="보험사(비우면 회사 기본)"
-        showClear
-        filter
-        @change="loadScope" />
-      <Button
-        label="불러오기"
-        severity="secondary"
-        :disabled="!companyId"
-        @click="loadScope" />
-      <Button label="기본값으로" text @click="rows = defaultOrderRows()" />
-    </div>
-
-    <template v-if="companyId">
-      <div class="flex flex-col gap-1 rounded border px-3 py-2">
+      <div
+        class="border-surface-200 dark:border-surface-700 flex flex-wrap items-center gap-3 border-t pt-3"
+        v-if="companyId">
         <div class="flex items-center gap-2">
           <ToggleSwitch v-model="enabled" input-id="enabled" @change="onToggleEnabled" />
-          <label for="enabled">이 회사에 영업일 순서 사용</label>
+          <label class="font-medium" for="enabled">이 회사에 영업일 순서 사용</label>
         </div>
-        <span class="text-surface-500 text-base" v-if="!enabled">
+        <span class="text-surface-500" v-if="!enabled">
           OFF: 기존 작업 동작 그대로 (정책은 저장만 되고 적용되지 않음)
         </span>
-        <span class="text-base text-orange-600" v-else>
+        <span class="text-orange-600" v-else>
           ON: 이 회사의 자동 생성 작업에 정책이 적용됩니다.
         </span>
       </div>
+    </div>
 
+    <template v-if="companyId">
       <Message
         v-if="insuranceCompanyCode && !scopeSaved"
         severity="info"
@@ -201,9 +209,12 @@
         :closable="false">
         회사 기본 정책이 아직 저장되지 않았습니다(기본 시드 표시 중).
       </Message>
-      <template v-if="!insuranceCompanyCode && savedPolicies.length">
-        <h3 class="mt-1 text-xl font-semibold">저장된 정책</h3>
-        <div class="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
+
+      <div
+        class="card !mb-0 flex flex-col gap-2 !p-4"
+        v-if="!insuranceCompanyCode && savedPolicies.length">
+        <h3 class="text-xl font-semibold">저장된 정책</h3>
+        <div class="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           <BusinessDayOrderPolicyCard
             v-for="p in savedPolicies"
             :key="p.code ?? '__default'"
@@ -212,30 +223,53 @@
             :editing="p.code === null"
             @edit="editPolicy(p.code)" />
         </div>
-        <h3 class="mt-1 text-xl font-semibold">회사 기본 정책 편집</h3>
-      </template>
+      </div>
 
-      <BusinessDayOrderRow
-        v-for="(row, i) in rows"
-        :key="i"
-        :row="row"
-        :index="i"
-        :invalid="invalidRows.has(i)"
-        @remove="removeRow(i)" />
+      <div class="card !mb-0 flex flex-col gap-3 !p-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h3 class="text-xl font-semibold">
+            {{
+              insuranceCompanyCode
+                ? `${insurerName(insuranceCompanyCode)} 전용 정책 편집`
+                : '회사 기본 정책 편집'
+            }}
+          </h3>
+          <Button
+            label="기본값으로"
+            icon="pi pi-undo"
+            severity="secondary"
+            text
+            @click="rows = defaultOrderRows()" />
+        </div>
 
-      <Message v-if="errors.length" severity="warn" :closable="false">
-        <ul class="m-0 list-disc pl-4">
-          <li v-for="e in errors" :key="e">{{ e }}</li>
-        </ul>
-      </Message>
+        <BusinessDayOrderRow
+          v-for="(row, i) in rows"
+          :key="i"
+          :row="row"
+          :index="i"
+          :invalid="invalidRows.has(i)"
+          @remove="removeRow(i)" />
 
-      <div class="flex gap-2">
-        <Button label="+ 영업일 구간 추가" severity="secondary" @click="addRow" />
-        <Button
-          label="저장"
-          :disabled="!companyId || errors.length > 0"
-          :loading="saving"
-          @click="save" />
+        <Message v-if="errors.length" severity="warn" :closable="false">
+          <ul class="m-0 list-disc pl-4">
+            <li v-for="e in errors" :key="e">{{ e }}</li>
+          </ul>
+        </Message>
+
+        <div class="flex justify-between gap-2">
+          <Button
+            label="영업일 구간 추가"
+            icon="pi pi-plus"
+            severity="secondary"
+            outlined
+            @click="addRow" />
+          <Button
+            label="저장"
+            icon="pi pi-check"
+            :disabled="!companyId || errors.length > 0"
+            :loading="saving"
+            @click="save" />
+        </div>
       </div>
     </template>
   </div>
