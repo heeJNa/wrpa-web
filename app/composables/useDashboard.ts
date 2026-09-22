@@ -18,12 +18,18 @@ export function useDashboard() {
 
   const refineWorkDate = computed(() => formatToKoreanTime(workDate.value, 'YYYY-MM-DD'))
 
+  // 동시에 여러 refresh() 가 겹칠 때(마운트·폴링·watch) 늦게 도착한 응답이
+  // 최신 상태를 덮어쓰지 않도록 요청마다 증가하는 토큰으로 최신 여부를 확인한다.
+  let requestSeq = 0
+
   const refresh = async () => {
+    const seq = ++requestSeq
     loading.value = true
     try {
       const { data: res, statusCode } = await request<DashboardResponse>(
         `/api/monitoring/dashboard?workDate=${refineWorkDate.value}&days=${days.value}`,
       )
+      if (seq !== requestSeq) return
       if (statusCode.value === 200 && res.value) {
         data.value = res.value
         lastError.value = null
@@ -31,10 +37,13 @@ export function useDashboard() {
         lastError.value = `${formatToKoreanTime(new Date(), 'HH:mm')} 갱신 실패`
       }
     } catch {
+      if (seq !== requestSeq) return
       lastError.value = `${formatToKoreanTime(new Date(), 'HH:mm')} 갱신 실패`
     } finally {
-      loading.value = false
-      now.value = Date.now()
+      if (seq === requestSeq) {
+        loading.value = false
+        now.value = Date.now()
+      }
     }
   }
 
