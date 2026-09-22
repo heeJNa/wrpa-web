@@ -27,12 +27,22 @@
   /** 현재 스코프에 저장된 정책이 있는지. 없으면 회사 기본(또는 시드)을 편집 중 */
   const scopeSaved = computed(() => !!findPolicy(insuranceCompanyCode.value))
   const companyDefaultSaved = computed(() => !!findPolicy(null))
-  const overrideCodes = computed(() =>
-    policies.value
-      .map((p) => p.insuranceCompanyCode)
-      .filter((c): c is string => !!c)
-      .map((c) => insuranceCompanyCodes.value.find((i) => i.code === c)?.name ?? c),
+  const insurerName = (code: string) =>
+    insuranceCompanyCodes.value.find((i) => i.code === code)?.name ?? code
+  /** 저장된 정책 목록(회사 기본 먼저). 보험사를 비웠을 때 전체를 카드로 보여준다 */
+  const savedPolicies = computed(() =>
+    [...policies.value]
+      .sort((a, b) => (a.insuranceCompanyCode ? 1 : 0) - (b.insuranceCompanyCode ? 1 : 0))
+      .map((p) => ({
+        code: p.insuranceCompanyCode ?? null,
+        title: p.insuranceCompanyCode ? insurerName(p.insuranceCompanyCode) : '회사 기본',
+        rows: p.rows ?? [],
+      })),
   )
+  const editPolicy = async (code: string | null) => {
+    insuranceCompanyCode.value = code
+    await loadScope()
+  }
   const errors = computed(() => validateOrderRows(rows.value))
   const invalidRows = computed(() => invalidRowIndexes(rows.value))
 
@@ -186,9 +196,19 @@
         :closable="false">
         회사 기본 정책이 아직 저장되지 않았습니다(기본 시드 표시 중).
       </Message>
-      <small class="text-surface-500" v-if="overrideCodes.length">
-        보험사 전용 정책 있음: {{ overrideCodes.join(', ') }}
-      </small>
+      <template v-if="!insuranceCompanyCode && savedPolicies.length">
+        <h3 class="mt-2 font-medium">저장된 정책</h3>
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <BusinessDayOrderPolicyCard
+            v-for="p in savedPolicies"
+            :key="p.code ?? '__default'"
+            :title="p.title"
+            :rows="p.rows"
+            :editing="p.code === null"
+            @edit="editPolicy(p.code)" />
+        </div>
+        <h3 class="mt-2 font-medium">회사 기본 정책 편집</h3>
+      </template>
 
       <BusinessDayOrderRow
         v-for="(row, i) in rows"
