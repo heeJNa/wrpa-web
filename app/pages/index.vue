@@ -1,19 +1,9 @@
 <script setup lang="ts">
-  const {
-    workDate,
-    days,
-    data,
-    loading,
-    lastError,
-    autoRefresh,
-    refresh,
-    generatedAgoSec,
-  } = useDashboard()
+  const { workDate, data, loading, lastError, refresh, generatedAt } = useDashboard()
   const { request } = useClientAPI()
   const confirm = useConfirm()
   const toast = useToast()
   const sending = ref(false)
-  // 1초마다 갱신되는 generatedAgoSec 틱 때문에 매번 새 Date 를 만들지 않도록 한 번만 생성
   const today = new Date()
 
   const lockedCount = computed(() =>
@@ -61,23 +51,22 @@
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
-    <div class="card flex flex-wrap items-center gap-3">
-      <h2 class="mr-auto text-lg font-semibold">RPA 대시보드</h2>
-      <DatePicker
-        class="w-44"
-        v-model="workDate"
-        date-format="yy-mm-dd"
-        show-icon
-        :max-date="today" />
-      <Select class="w-24" v-model="days" :options="[7, 14, 30]" />
-      <div class="text-surface-500 flex items-center gap-2 text-xs">
-        <ToggleSwitch v-model="autoRefresh" />
-        <span>60초 자동갱신</span>
-        <span v-if="generatedAgoSec !== null"
-          >· {{ generatedAgoSec }}초 전 집계<span v-if="data?.cached"> (캐시)</span></span
-        >
-        <span class="text-red-600" v-if="lastError">· {{ lastError }}</span>
+  <div class="flex flex-col gap-5 pb-10">
+    <div class="card mb-0 flex flex-wrap items-center gap-x-4 gap-y-3">
+      <h2 class="text-lg font-semibold">RPA 대시보드</h2>
+      <div class="flex items-center gap-2">
+        <label class="text-surface-500 text-sm" for="dashboard-work-date">기준일</label>
+        <DatePicker
+          class="w-44"
+          input-id="dashboard-work-date"
+          v-model="workDate"
+          date-format="yy-mm-dd"
+          show-icon
+          :max-date="today" />
+      </div>
+      <div class="text-surface-400 mr-auto text-xs">
+        <span v-if="generatedAt">{{ generatedAt }} 집계</span>
+        <span class="text-red-500" v-if="lastError">{{ lastError }}</span>
       </div>
       <Button
         label="새로고침"

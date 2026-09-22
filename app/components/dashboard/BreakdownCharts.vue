@@ -2,6 +2,7 @@
   import type { CompanyStat, StateCounts } from '~/types/dashboard'
   import {
     chartTextColor,
+  chartGridColor,
     companyChartData,
     stateDonutData,
   } from '~/utils/dashboardChart'
@@ -19,19 +20,34 @@
 
   const stacked = computed(() => {
     const color = chartTextColor(isDarkTheme.value)
+    const gridColor = chartGridColor(isDarkTheme.value)
     return {
       maintainAspectRatio: false,
-      plugins: { legend: { labels: { color } } },
+      plugins: {
+        legend: { labels: { color, usePointStyle: true, pointStyle: 'circle', padding: 16, boxWidth: 8 } },
+      },
+      // 회사 수가 적어도 허전해 보이지 않고, 옆의 작업자·보험사 차트와 읽는 방향이 같도록 가로 막대로 둔다
+      indexAxis: 'y' as const,
       scales: {
-        x: { stacked: true, ticks: { color, autoSkip: false } },
-        y: { stacked: true, beginAtZero: true, ticks: { color } },
+        x: { stacked: true, beginAtZero: true, ticks: { color }, grid: { color: gridColor } },
+        y: { stacked: true, ticks: { color, autoSkip: false }, grid: { display: false } },
       },
     }
   })
   const donutOptions = computed(() => ({
     maintainAspectRatio: false,
     cutout: '60%',
-    plugins: { legend: { labels: { color: chartTextColor(isDarkTheme.value) } } },
+    plugins: {
+      legend: {
+        labels: {
+          color: chartTextColor(isDarkTheme.value),
+          usePointStyle: true,
+          pointStyle: 'circle',
+          padding: 16,
+          boxWidth: 8,
+        },
+      },
+    },
   }))
 </script>
 

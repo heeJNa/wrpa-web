@@ -49,20 +49,20 @@
 <template>
   <div class="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
     <div
-      class="border-surface-200 bg-surface-0 dark:border-surface-700 dark:bg-surface-900 rounded-lg border p-3"
+      class="border-surface-100 bg-surface-0 dark:border-surface-800 dark:bg-surface-900 rounded-xl border px-4 py-3.5"
       v-for="tile in tiles"
       :key="tile.label">
-      <div class="text-surface-500 text-xs">{{ tile.label }}</div>
+      <div class="text-surface-400 text-xs font-medium">{{ tile.label }}</div>
       <div
-        class="mt-1 text-2xl font-semibold"
+        class="text-surface-800 dark:text-surface-100 mt-1.5 text-[1.6rem] leading-none font-semibold tracking-tight"
         :class="{
-          'text-green-600': tile.tone === 'success',
-          'text-red-600': tile.tone === 'danger',
-          'text-amber-600': tile.tone === 'warn',
+          'text-[#5f9b80] dark:text-[#7fba9c]': tile.tone === 'success',
+          'text-[#cc4b47] dark:text-[#e3706c]': tile.tone === 'danger',
+          'text-[#c08f45] dark:text-[#d8a75c]': tile.tone === 'warn',
         }">
         {{ tile.value ?? '(조회 실패)' }}
       </div>
-      <div class="text-surface-500 mt-1 text-xs" v-if="tile.sub">{{ tile.sub }}</div>
+      <div class="text-surface-400 mt-2 text-xs leading-relaxed" v-if="tile.sub">{{ tile.sub }}</div>
     </div>
   </div>
 </template>

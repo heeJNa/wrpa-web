@@ -8,17 +8,26 @@ import type {
   WorkerStat,
 } from '~/types/dashboard'
 
-// PrimeVue 테마 토큰과 어울리는 고정 팔레트. 상태 의미색은 화면 어디서나 같게 유지한다
+// 상태 의미색은 화면 어디서나 같게 유지한다. 종일 띄워 두는 화면이라 채도를 낮춰
+// 눈이 편하게 하되, '실패'만은 또렷하게 남겨 시선이 거기로 가게 한다.
 export const CHART_COLORS = {
-  success: '#22c55e',
-  fail: '#ef4444',
-  waiting: '#a3a3a3',
-  working: '#3b82f6',
-  cancel: '#f59e0b',
-  etc: '#d4d4d4',
-  line: '#dc2626',
+  success: '#6aa88a',
+  fail: '#d9534f',
+  waiting: '#b8b5ae',
+  working: '#7b96c4',
+  cancel: '#d6a75c',
+  etc: '#dcd9d3',
+  line: '#c2453f',
   // 잔량 선은 '실패' 막대(빨강)와 같은 차트에 겹치므로 다른 색이어야 범례에서 구분된다
-  backlog: '#7c3aed',
+  backlog: '#8878b8',
+}
+
+/** 막대가 하나뿐일 때 화면 절반을 덮지 않도록 제한한다 */
+export const MAX_BAR_THICKNESS = 26
+
+/** 눈금선은 데이터를 읽는 보조선일 뿐이므로 거의 보이지 않을 만큼 옅게 */
+export function chartGridColor(dark: boolean): string {
+  return dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'
 }
 
 export function percent(rate: number): string {
@@ -40,27 +49,50 @@ function roundPercent(rate: number): number {
   return Math.round(rate * 1000) / 10
 }
 
-/** 최근 N일: 막대(처리량) + 선(실패율 %, 우측 축). 백필 실패한 날은 null 로 비운다 */
+/**
+ * 최근 N일: 성공·실패 누적막대 + 실패율 선(우측 축). 백필 전인 날은 null 로 비운다.
+ * 처리량 하나만 그리면 월초·월중 차이만 보이고 정작 나빠졌는지는 안 보이므로
+ * 같은 막대를 성공/실패로 쪼개고 비율을 선으로 겹친다.
+ * order 가 작을수록 위에 그려진다 — 실패율 선이 막대에 가리지 않게 한다.
+ */
 export function trendChartData(trend: (TrendPoint | null)[]) {
   return {
     labels: trend.map((p) => (p ? shortDate(p.workDate) : '')),
     datasets: [
       {
-        type: 'bar',
-        label: '처리량',
-        yAxisID: 'y',
-        backgroundColor: CHART_COLORS.working,
-        data: trend.map((p) => (p ? p.counts.total : null)),
-      },
-      {
         type: 'line',
         label: '실패율(%)',
         yAxisID: 'y1',
+        order: 0,
         borderColor: CHART_COLORS.line,
         backgroundColor: CHART_COLORS.line,
+        borderWidth: 2,
+        pointRadius: 2,
         tension: 0.3,
         spanGaps: false,
         data: trend.map((p) => (p ? roundPercent(p.counts.failRate) : null)),
+      },
+      {
+        type: 'bar',
+        label: '성공',
+        yAxisID: 'y',
+        order: 1,
+        stack: 'trend',
+        maxBarThickness: MAX_BAR_THICKNESS,
+        borderRadius: 3,
+        backgroundColor: CHART_COLORS.success,
+        data: trend.map((p) => (p ? p.counts.success : null)),
+      },
+      {
+        type: 'bar',
+        label: '실패',
+        yAxisID: 'y',
+        order: 1,
+        stack: 'trend',
+        maxBarThickness: MAX_BAR_THICKNESS,
+        borderRadius: 3,
+        backgroundColor: CHART_COLORS.fail,
+        data: trend.map((p) => (p ? p.counts.fail : null)),
       },
     ],
   }
@@ -74,11 +106,15 @@ export function companyChartData(byCompany: CompanyStat[]) {
       {
         label: '성공',
         backgroundColor: CHART_COLORS.success,
+        maxBarThickness: MAX_BAR_THICKNESS,
+        borderRadius: 3,
         data: byCompany.map((c) => c.counts.success),
       },
       {
         label: '실패',
         backgroundColor: CHART_COLORS.fail,
+        maxBarThickness: MAX_BAR_THICKNESS,
+        borderRadius: 3,
         data: byCompany.map((c) => c.counts.fail),
       },
     ],
@@ -102,6 +138,8 @@ export function insurerFailRateData(byInsurer: InsurerStat[], topN = 10) {
       {
         label: '실패율(%)',
         backgroundColor: CHART_COLORS.fail,
+        maxBarThickness: MAX_BAR_THICKNESS,
+        borderRadius: 3,
         data: ranked.map((i) => roundPercent(i.counts.failRate)),
       },
     ],
@@ -116,6 +154,8 @@ export function failureReasonData(reasons: FailureReasonStat[]) {
       {
         label: '실패 건수',
         backgroundColor: CHART_COLORS.fail,
+        maxBarThickness: MAX_BAR_THICKNESS,
+        borderRadius: 3,
         data: reasons.map((r) => r.count),
       },
     ],
@@ -133,11 +173,15 @@ export function workerChartData(byWorker: WorkerStat[], topN = 10) {
       {
         label: '성공',
         backgroundColor: CHART_COLORS.success,
+        maxBarThickness: MAX_BAR_THICKNESS,
+        borderRadius: 3,
         data: ranked.map((w) => w.counts.success),
       },
       {
         label: '실패',
         backgroundColor: CHART_COLORS.fail,
+        maxBarThickness: MAX_BAR_THICKNESS,
+        borderRadius: 3,
         data: ranked.map((w) => w.counts.fail),
       },
     ],
@@ -156,6 +200,8 @@ export function hourlyProgressData(hourly: HourlyPoint[], dayTotal: number | nul
       stack: 'hourly',
       yAxisID: 'y',
       backgroundColor: CHART_COLORS.success,
+      maxBarThickness: MAX_BAR_THICKNESS,
+      borderRadius: 3,
       data: hourly.map((h) => h.success),
     },
     {
@@ -164,6 +210,8 @@ export function hourlyProgressData(hourly: HourlyPoint[], dayTotal: number | nul
       stack: 'hourly',
       yAxisID: 'y',
       backgroundColor: CHART_COLORS.fail,
+      maxBarThickness: MAX_BAR_THICKNESS,
+      borderRadius: 3,
       data: hourly.map((h) => h.fail),
     },
   ]

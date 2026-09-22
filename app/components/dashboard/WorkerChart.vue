@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { WorkerStat } from '~/types/dashboard'
-  import { chartTextColor, workerChartData } from '~/utils/dashboardChart'
+  import { chartTextColor,
+  chartGridColor, workerChartData } from '~/utils/dashboardChart'
 
   const props = defineProps<{
     byWorker: WorkerStat[] | null
@@ -13,22 +14,25 @@
 
   const options = computed(() => {
     const color = chartTextColor(isDarkTheme.value)
+    const gridColor = chartGridColor(isDarkTheme.value)
     return {
       maintainAspectRatio: false,
       indexAxis: 'y' as const,
-      plugins: { legend: { labels: { color } } },
+      plugins: {
+        legend: { labels: { color, usePointStyle: true, pointStyle: 'circle', padding: 16, boxWidth: 8 } },
+      },
       scales: {
-        x: { stacked: true, beginAtZero: true, ticks: { color } },
+        x: { stacked: true, beginAtZero: true, ticks: { color }, grid: { color: gridColor } },
         // autoSkip 을 끄지 않으면 chart.js 가 카드 폭에 맞춰 작업자 이름을 건너뛴다 —
         // 순위 차트에서 이름 없는 막대는 쓸모가 없으므로 전부 그린다.
-        y: { stacked: true, ticks: { color, autoSkip: false } },
+        y: { stacked: true, ticks: { color, autoSkip: false }, grid: { display: false } },
       },
     }
   })
 </script>
 
 <template>
-  <div class="card mb-0 flex h-96 flex-col">
+  <div class="card mb-0 flex flex-col" :class="worker && worker.labels.length ? 'h-96' : ''">
     <h3 class="mb-2 text-sm font-semibold">작업자별 처리량 · 실패 상위 10</h3>
     <Chart
       class="min-h-0 flex-1"

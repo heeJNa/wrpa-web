@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { HourlyPoint } from '~/types/dashboard'
-  import { chartTextColor, hourlyProgressData } from '~/utils/dashboardChart'
+  import { chartTextColor,
+  chartGridColor, hourlyProgressData } from '~/utils/dashboardChart'
 
   const props = defineProps<{
     hourly: HourlyPoint[] | null
@@ -14,24 +15,28 @@
 
   const chartOptions = computed(() => {
     const color = chartTextColor(isDarkTheme.value)
+    const gridColor = chartGridColor(isDarkTheme.value)
     return {
       maintainAspectRatio: false,
       interaction: { mode: 'index' as const, intersect: false },
-      plugins: { legend: { labels: { color } } },
+      plugins: {
+        legend: { labels: { color, usePointStyle: true, pointStyle: 'circle', padding: 16, boxWidth: 8 } },
+      },
       scales: {
-        x: { ticks: { color } },
+        x: { ticks: { color }, grid: { color: gridColor } },
         y: {
           stacked: true,
           beginAtZero: true,
           title: { display: true, text: '건', color },
-          ticks: { color },
+          ticks: { color }, grid: { color: gridColor },
         },
         y1: {
           beginAtZero: true,
           position: 'right' as const,
-          grid: { drawOnChartArea: false },
+
           title: { display: true, text: '잔량', color },
           ticks: { color },
+          grid: { drawOnChartArea: false },
         },
       },
     }
@@ -39,7 +44,7 @@
 </script>
 
 <template>
-  <div class="card flex h-80 flex-col">
+  <div class="card flex flex-col" :class="chartData && chartData.labels.length ? 'h-80' : ''">
     <h3 class="mb-2 text-sm font-semibold">시간대별 처리량 · 미완료 잔량</h3>
     <Chart
       class="min-h-0 flex-1"
