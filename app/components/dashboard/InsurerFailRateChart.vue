@@ -41,7 +41,7 @@
       type="bar"
       :data="insurer"
       :options="options" />
-    <p class="text-surface-500 text-sm" v-else-if="insurer">집계할 작업 없음</p>
+    <p class="text-surface-500 text-sm" v-else-if="insurer">실패 없음</p>
     <p class="text-surface-500 text-sm" v-else>(조회 실패)</p>
   </div>
 </template>

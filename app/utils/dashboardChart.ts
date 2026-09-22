@@ -17,6 +17,8 @@ export const CHART_COLORS = {
   cancel: '#f59e0b',
   etc: '#d4d4d4',
   line: '#dc2626',
+  // 잔량 선은 '실패' 막대(빨강)와 같은 차트에 겹치므로 다른 색이어야 범례에서 구분된다
+  backlog: '#7c3aed',
 }
 
 export function percent(rate: number): string {
@@ -86,7 +88,8 @@ export function companyChartData(byCompany: CompanyStat[]) {
 /** 보험사별 실패율 상위 N(가로막대). 성공+실패가 0 인 보험사는 제외 */
 export function insurerFailRateData(byInsurer: InsurerStat[], topN = 10) {
   const ranked = byInsurer
-    .filter((i) => i.counts.success + i.counts.fail > 0)
+    // 실패가 0인 보험사는 뺀다 — '실패율 상위'에 0% 줄이 끼면 자리만 차지한다
+    .filter((i) => i.counts.fail > 0)
     .sort(
       (a, b) => b.counts.failRate - a.counts.failRate || b.counts.fail - a.counts.fail,
     )
@@ -175,8 +178,8 @@ export function hourlyProgressData(hourly: HourlyPoint[], dayTotal: number | nul
       type: 'line',
       label: '미완료 잔량',
       yAxisID: 'y1',
-      borderColor: CHART_COLORS.line,
-      backgroundColor: CHART_COLORS.line,
+      borderColor: CHART_COLORS.backlog,
+      backgroundColor: CHART_COLORS.backlog,
       tension: 0.3,
       data: backlog,
     })

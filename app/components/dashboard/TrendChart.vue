@@ -37,7 +37,7 @@
     <div class="mb-2 flex items-center justify-between">
       <h3 class="text-sm font-semibold">최근 {{ trend.length }}일 처리량 · 실패율</h3>
       <span class="text-surface-500 text-xs" v-if="trend.some((p) => p === null)"
-        >빈 칸 = 집계 실패(다음 갱신에 재시도)</span
+        >빈 칸 = 아직 집계 전(갱신할 때마다 채워짐)</span
       >
     </div>
     <Chart class="min-h-0 flex-1" type="bar" :data="chartData" :options="chartOptions" />
