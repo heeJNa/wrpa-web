@@ -17,8 +17,8 @@ export const CHART_COLORS = {
   working: '#7b96c4',
   cancel: '#d6a75c',
   etc: '#dcd9d3',
-  line: '#c2453f',
-  // 잔량 선은 '실패' 막대(빨강)와 같은 차트에 겹치므로 다른 색이어야 범례에서 구분된다
+  // 선 그래프는 '실패' 막대(빨강)와 겹쳐 그려지므로 다른 색이어야 범례에서 구분된다.
+  // 시간대별 '미완료 잔량'과 30일 '실패율'이 같은 색을 쓴다 — 둘 다 막대 위의 추세선이다.
   backlog: '#8878b8',
 }
 
@@ -64,8 +64,8 @@ export function trendChartData(trend: (TrendPoint | null)[]) {
         label: '실패율(%)',
         yAxisID: 'y1',
         order: 0,
-        borderColor: CHART_COLORS.line,
-        backgroundColor: CHART_COLORS.line,
+        borderColor: CHART_COLORS.backlog,
+        backgroundColor: CHART_COLORS.backlog,
         borderWidth: 2,
         pointRadius: 2,
         tension: 0.3,
@@ -197,6 +197,7 @@ export function hourlyProgressData(hourly: HourlyPoint[], dayTotal: number | nul
     {
       type: 'bar',
       label: '성공',
+      order: 1,
       stack: 'hourly',
       yAxisID: 'y',
       backgroundColor: CHART_COLORS.success,
@@ -207,6 +208,7 @@ export function hourlyProgressData(hourly: HourlyPoint[], dayTotal: number | nul
     {
       type: 'bar',
       label: '실패',
+      order: 1,
       stack: 'hourly',
       yAxisID: 'y',
       backgroundColor: CHART_COLORS.fail,
@@ -225,6 +227,7 @@ export function hourlyProgressData(hourly: HourlyPoint[], dayTotal: number | nul
     datasets.push({
       type: 'line',
       label: '미완료 잔량',
+      order: 0,
       yAxisID: 'y1',
       borderColor: CHART_COLORS.backlog,
       backgroundColor: CHART_COLORS.backlog,
