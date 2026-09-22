@@ -241,9 +241,14 @@
       </DialogForm>
       <div></div>
       <div class="col-span-2 flex justify-between gap-4">
-        <DialogForm label="생성 범위 기준" :error="errors?.activeBasis" required>
+        <DialogForm
+          class="shrink-0"
+          label="생성 범위 기준"
+          :error="errors?.activeBasis"
+          required>
           <template #input>
             <SelectButton
+              class="whitespace-nowrap"
               id="activeBasis"
               v-model="jobForm.activeBasis"
               :options="ACTIVE_BASIS_OPTIONS"
@@ -252,7 +257,7 @@
               :allow-empty="false" />
           </template>
         </DialogForm>
-        <DialogForm label="시작" :error="errors?.activeFrom">
+        <DialogForm class="flex-1" label="시작" :error="errors?.activeFrom">
           <template #input>
             <InputNumber
               id="activeFrom"
@@ -265,7 +270,7 @@
               placeholder="비움=1" />
           </template>
         </DialogForm>
-        <DialogForm label="종료" :error="errors?.activeTo">
+        <DialogForm class="flex-1" label="종료" :error="errors?.activeTo">
           <template #input>
             <InputNumber
               id="activeTo"
@@ -278,11 +283,12 @@
               placeholder="비움=무제한" />
           </template>
         </DialogForm>
-        <DialogForm label="시간" :error="errors?.workTime" required>
+        <DialogForm class="flex-1" label="시간" :error="errors?.workTime" required>
           <template #input>
             <InputText
               id="workTime"
               v-model="jobForm.workTime"
+              fluid
               autocomplete="off"
               :invalid="!!errors?.workTime"
               placeholder="hh:mm" />
