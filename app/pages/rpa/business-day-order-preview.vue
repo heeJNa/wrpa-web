@@ -39,8 +39,15 @@
     insuranceCompanyCodes.value.find((c) => c.code === code)?.name ?? code ?? '-'
   const jobTypeLabel = (type: string | null) =>
     (type && JobTypesEnum[type as keyof typeof JobTypesEnum]) || type || '-'
-  const closingLabel = (n: number | null) =>
-    n == null ? '-' : n < 0 ? `전월(${n})` : n === 0 ? '당월' : `+${n}`
+  // 4카테고리(신계약/수금 × 전월/당월) 밖 작업은 category가 없으므로 작업구분으로 대신 표시
+  const categoryOrJobType = (row: PreviewRow) =>
+    row.category ? categoryLabel(row.category) : jobTypeLabel(row.jobType)
+
+  type OrderedRow = PreviewRow & { executionOrder: number }
+  // 서버 정렬(시작시각 → 우선순위)이 실제 실행순서. 표를 다른 컬럼으로 정렬해도 이 번호는 유지된다
+  const orderedRows = computed<OrderedRow[]>(() =>
+    (result.value?.rows ?? []).map((r, i) => ({ ...r, executionOrder: i + 1 })),
+  )
 
   const preview = async () => {
     if (!companyId.value || !date.value) return
@@ -116,35 +123,34 @@
       </Message>
 
       <DataTable
-        :value="result.rows"
+        :value="orderedRows"
         data-key="jobId"
         size="small"
         show-gridlines
-        striped-rows>
+        striped-rows
+        sort-field="executionOrder"
+        :sort-order="1"
+        removable-sort>
         <template #empty>생성될 작업이 없습니다.</template>
-        <Column class="w-20 text-center" header="실행순서">
-          <template #body="{ index }">{{ index + 1 }}</template>
-        </Column>
+        <Column
+          class="w-20 text-center"
+          field="executionOrder"
+          header="실행순서"
+          sortable />
         <Column header="보험사">
           <template #body="{ data }">{{
             insurerName(data.insuranceCompanyCode)
           }}</template>
         </Column>
-        <Column class="text-center" header="작업구분">
-          <template #body="{ data }">{{ jobTypeLabel(data.jobType) }}</template>
-        </Column>
-        <Column class="text-center" header="업적월">
-          <template #body="{ data }">{{ closingLabel(data.closingMonthNum) }}</template>
-        </Column>
         <Column class="text-center" header="카테고리">
-          <template #body="{ data }">{{ categoryLabel(data.category) }}</template>
+          <template #body="{ data }">{{ categoryOrJobType(data) }}</template>
         </Column>
-        <Column class="text-center" header="시작시각">
+        <Column class="text-center" field="startAfter" header="시작시각" sortable>
           <template #body="{ data }">{{
             data.startAfter ?? data.workTime ?? '-'
           }}</template>
         </Column>
-        <Column class="text-right" field="priority" header="우선순위"></Column>
+        <Column class="text-right" field="priority" header="우선순위" sortable></Column>
         <Column class="w-20 text-center" header="수동">
           <template #body="{ data }">
             <Tag v-if="data.manual" value="수동" severity="warn" />
@@ -153,7 +159,7 @@
       </DataTable>
 
       <template v-if="result.skippedRows?.length">
-        <h3 class="mt-2 font-medium">생성되지 않는 작업 (유효 영업일 범위 밖)</h3>
+        <h3 class="mt-2 font-medium">생성되지 않는 작업 (작업일정 생성 범위·휴일제외)</h3>
         <DataTable
           :value="result.skippedRows"
           data-key="jobId"
@@ -165,14 +171,8 @@
               insurerName(data.insuranceCompanyCode)
             }}</template>
           </Column>
-          <Column class="text-center" header="작업구분">
-            <template #body="{ data }">{{ jobTypeLabel(data.jobType) }}</template>
-          </Column>
-          <Column class="text-center" header="업적월">
-            <template #body="{ data }">{{ closingLabel(data.closingMonthNum) }}</template>
-          </Column>
           <Column class="text-center" header="카테고리">
-            <template #body="{ data }">{{ categoryLabel(data.category) }}</template>
+            <template #body="{ data }">{{ categoryOrJobType(data) }}</template>
           </Column>
           <Column class="text-center" field="workTime" header="작업시각"></Column>
         </DataTable>
