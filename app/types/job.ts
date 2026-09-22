@@ -85,6 +85,7 @@ interface Job extends JobForm {
   insuranceCompanyCode?: string
   activeWindowPretty?: string
   legacyWindowConflict?: boolean
+  legacyBizDayPretty?: string | null
 }
 
 const manualJobSchema = z.object({

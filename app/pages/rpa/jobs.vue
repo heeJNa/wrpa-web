@@ -215,6 +215,17 @@
       })
       return
     }
+    // 기준만 바꾸면 숫자가 그대로 재해석돼(예: 일자 25~31 → 영업일 25~31) 생성이 끊길 수 있다
+    const p = batchUpdatePayload.value
+    if (p.activeBasis != null && (p.activeFrom == null || p.activeTo == null)) {
+      toast.add({
+        severity: 'warn',
+        summary: '경고',
+        detail: '범위 기준을 바꿀 때는 범위 시작·종료도 함께 입력해주세요.',
+        life: 4000,
+      })
+      return
+    }
     batchUpdatePayload.value.ids = selection.value.map((job) => job.id)
     try {
       const { statusCode } = await request(`/api/contract-crawl/jobs/batch/update-v2`, {
@@ -631,7 +642,7 @@
             class="ml-1"
             v-if="slotProps.data?.legacyWindowConflict"
             v-tooltip.top="
-              '예전 일자 범위와 영업일 범위가 둘 다 설정돼 있어 일자 범위로 동작 중입니다. 열어서 기준을 확정하세요.'
+              `예전 일자 범위와 영업일 범위(${slotProps.data.legacyBizDayPretty ?? '?'})가 둘 다 설정돼 있어 일자 범위로 동작 중입니다. 열어서 기준을 확정하세요.`
             "
             value="범위 확인"
             severity="danger" />

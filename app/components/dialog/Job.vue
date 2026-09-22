@@ -290,6 +290,14 @@
         </DialogForm>
       </div>
       <small class="text-surface-500 col-span-2">{{ windowHint }}</small>
+      <Message
+        class="col-span-2"
+        v-if="dialogRef.data?.legacyWindowConflict"
+        severity="warn"
+        :closable="false">
+        예전 영업일 범위 {{ dialogRef.data?.legacyBizDayPretty ?? '?' }}가 함께 저장돼
+        있습니다. 위 기준·범위를 확정해 저장하면 정리됩니다.
+      </Message>
       <div class="col-span-2 flex gap-4">
         <DialogForm
           class="flex-1/5"
