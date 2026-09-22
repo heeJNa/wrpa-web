@@ -1,9 +1,6 @@
 <script setup lang="ts">
   const { workDate, data, loading, lastError, refresh, generatedAt } = useDashboard()
-  const { request } = useClientAPI()
-  const confirm = useConfirm()
-  const toast = useToast()
-  const sending = ref(false)
+  const { sending, send: sendReport } = useDailyReport()
   const today = new Date()
 
   const lockedCount = computed(() =>
@@ -15,39 +12,6 @@
       : null,
   )
 
-  const sendReport = () => {
-    confirm.require({
-      header: '텔레그램 보고 발송',
-      message: `${formatToKoreanTime(workDate.value, 'YYYY-MM-DD')} 종합상황보고를 지금 보낼까요?`,
-      icon: 'pi pi-send',
-      acceptProps: { label: '발송' },
-      rejectProps: { label: '취소', severity: 'secondary', outlined: true },
-      accept: () => {
-        sending.value = true
-        request<{ sent: number; workDate: string }>(
-          `/api/monitoring/daily-report?workDate=${formatToKoreanTime(workDate.value, 'YYYY-MM-DD')}`,
-          { method: 'POST' },
-        ).then(({ data: res, statusCode }) => {
-          if (statusCode.value === 200) {
-            toast.add({
-              severity: 'success',
-              summary: '성공',
-              detail: `텔레그램 보고 발송 완료 (${res.value?.sent ?? 0}건)`,
-              life: 3000,
-            })
-          } else {
-            toast.add({
-              severity: 'error',
-              summary: '실패',
-              detail: '텔레그램 보고 발송에 실패했습니다.',
-              life: 5000,
-            })
-          }
-          sending.value = false
-        })
-      },
-    })
-  }
 </script>
 
 <template>
@@ -79,7 +43,7 @@
         label="텔레그램 발송"
         icon="pi pi-send"
         :loading="sending"
-        @click="sendReport" />
+        @click="sendReport(formatToKoreanTime(workDate, 'YYYY-MM-DD'))" />
     </div>
 
     <template v-if="data">
