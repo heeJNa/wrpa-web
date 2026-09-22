@@ -114,6 +114,7 @@
           props: {
             modal: true,
             header: `작업일정 상세`,
+            style: { width: '64rem', maxWidth: '95vw' },
           },
           onClose: (options) => {
             const data = options?.data
@@ -128,6 +129,7 @@
       props: {
         modal: true,
         header: `작업일정 생성`,
+        style: { width: '64rem', maxWidth: '95vw' },
       },
       onClose: (options) => {
         if (options?.data) execute()
