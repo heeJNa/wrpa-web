@@ -30,3 +30,6 @@ logs
 # Zip
 *.zip
 *.tar.gz
+
+# Scratch
+scratch/
