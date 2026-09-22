@@ -157,26 +157,6 @@
           </template>
         </Column>
       </DataTable>
-
-      <template v-if="result.skippedRows?.length">
-        <h3 class="mt-2 font-medium">생성되지 않는 작업 (작업일정 생성 범위·휴일제외)</h3>
-        <DataTable
-          :value="result.skippedRows"
-          data-key="jobId"
-          size="small"
-          show-gridlines
-          striped-rows>
-          <Column header="보험사">
-            <template #body="{ data }">{{
-              insurerName(data.insuranceCompanyCode)
-            }}</template>
-          </Column>
-          <Column class="text-center" header="카테고리">
-            <template #body="{ data }">{{ categoryOrJobType(data) }}</template>
-          </Column>
-          <Column class="text-center" field="workTime" header="작업시각"></Column>
-        </DataTable>
-      </template>
     </template>
   </div>
 </template>
