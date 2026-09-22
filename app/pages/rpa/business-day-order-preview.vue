@@ -39,9 +39,15 @@
     insuranceCompanyCodes.value.find((c) => c.code === code)?.name ?? code ?? '-'
   const jobTypeLabel = (type: string | null) =>
     (type && JobTypesEnum[type as keyof typeof JobTypesEnum]) || type || '-'
-  // 4카테고리(신계약/수금 × 전월/당월) 밖 작업은 category가 없으므로 작업구분으로 대신 표시
-  const categoryOrJobType = (row: PreviewRow) =>
-    row.category ? categoryLabel(row.category) : jobTypeLabel(row.jobType)
+  // 업적월은 당월 기준 오프셋(0=당월, -1=전월). 4카테고리 밖 작업(수수료 등)은 category가 없다
+  const closingMonthLabel = (n: number | null) =>
+    n === null
+      ? '-'
+      : n === 0
+        ? '당월'
+        : n === -1
+          ? '전월'
+          : `${n > 0 ? '+' : ''}${n}개월`
 
   type OrderedRow = PreviewRow & { executionOrder: number }
   // 서버 정렬(시작시각 → 우선순위)이 실제 실행순서. 표를 다른 컬럼으로 정렬해도 이 번호는 유지된다
@@ -96,7 +102,7 @@
             placeholder="회사 선택"
             showClear
             filter />
-          <DatePicker class="w-40" v-model="date" date-format="yy-mm-dd" show-icon />
+          <DatePicker class="w-48" v-model="date" date-format="yy-mm-dd" show-icon />
           <Button
             label="미리보기"
             icon="pi pi-search"
@@ -151,11 +157,21 @@
             insurerName(data.insuranceCompanyCode)
           }}</template>
         </Column>
+        <Column class="w-32 text-center whitespace-nowrap" header="작업구분">
+          <template #body="{ data }">{{ jobTypeLabel(data.jobType) }}</template>
+        </Column>
+        <Column class="w-28 text-center whitespace-nowrap" header="업적월">
+          <template #body="{ data }">{{
+            closingMonthLabel(data.closingMonthNum)
+          }}</template>
+        </Column>
         <Column class="text-center" header="카테고리">
-          <template #body="{ data }">{{ categoryOrJobType(data) }}</template>
+          <template #body="{ data }">{{
+            data.category ? categoryLabel(data.category) : '-'
+          }}</template>
         </Column>
         <Column
-          class="text-center whitespace-nowrap"
+          class="w-48 text-center whitespace-nowrap"
           field="startAfter"
           header="시작시각"
           sortable>
