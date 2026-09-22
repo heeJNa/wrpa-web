@@ -26,9 +26,14 @@
         sub: t && t.cancel ? `취소 ${t.cancel}` : '',
       },
       {
+        // 텔레그램 종합상황보고의 작업자 줄과 같은 숫자·같은 문구로 읽히게 한다 —
+        // 총 대수와 '미설정 제외'가 빠지면 보고서와 대조할 때 암산이 필요하다.
         label: '작업자',
-        value: w ? `${w.idle} / ${w.busy}` : null,
-        sub: w ? `대기 / 작업중 · 응답없음 ${w.unhealthy.length}` : '',
+        value: w ? `${w.total}대` : null,
+        sub: w
+          ? `대기 ${w.idle} · 작업중 ${w.busy} · 응답없음 ${w.unhealthy.length}` +
+            (w.ignored ? ` · 미설정 ${w.ignored}대 제외` : '')
+          : '',
         tone: w && w.unhealthy.length ? 'danger' : undefined,
       },
       {
