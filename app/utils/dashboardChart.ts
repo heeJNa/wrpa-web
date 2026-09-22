@@ -1,6 +1,7 @@
 import type {
   CompanyStat,
   FailureReasonStat,
+  HourlyPoint,
   InsurerStat,
   StateCounts,
   TrendPoint,
@@ -137,6 +138,53 @@ export function workerChartData(byWorker: WorkerStat[], topN = 10) {
         data: ranked.map((w) => w.counts.fail),
       },
     ],
+  }
+}
+
+/**
+ * 시간대별 성공/실패(누적막대) + 미완료 잔량(선, 우측 축).
+ * dayTotal 이 null 이면 총건수를 모르므로 잔량 선은 아예 그리지 않는다.
+ */
+export function hourlyProgressData(hourly: HourlyPoint[], dayTotal: number | null) {
+  const datasets: Record<string, unknown>[] = [
+    {
+      type: 'bar',
+      label: '성공',
+      stack: 'hourly',
+      yAxisID: 'y',
+      backgroundColor: CHART_COLORS.success,
+      data: hourly.map((h) => h.success),
+    },
+    {
+      type: 'bar',
+      label: '실패',
+      stack: 'hourly',
+      yAxisID: 'y',
+      backgroundColor: CHART_COLORS.fail,
+      data: hourly.map((h) => h.fail),
+    },
+  ]
+
+  if (dayTotal !== null) {
+    let cumulative = 0
+    const backlog = hourly.map((h) => {
+      cumulative += h.success + h.fail
+      return Math.max(dayTotal - cumulative, 0)
+    })
+    datasets.push({
+      type: 'line',
+      label: '미완료 잔량',
+      yAxisID: 'y1',
+      borderColor: CHART_COLORS.line,
+      backgroundColor: CHART_COLORS.line,
+      tension: 0.3,
+      data: backlog,
+    })
+  }
+
+  return {
+    labels: hourly.map((h) => `${h.hour}시`),
+    datasets,
   }
 }
 

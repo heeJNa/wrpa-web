@@ -99,6 +99,9 @@
         :workers="data.workers"
         :locked-count="lockedCount" />
       <DashboardTrendChart :trend="data.trend" />
+      <DashboardHourlyProgressChart
+        :hourly="data.hourly"
+        :day-total="data.totals?.total ?? null" />
       <div class="grid grid-cols-1 gap-4 xl:grid-cols-3">
         <DashboardFailureReasonChart :failure-reasons="data.failureReasons" />
         <DashboardWorkerChart :by-worker="data.byWorker" />

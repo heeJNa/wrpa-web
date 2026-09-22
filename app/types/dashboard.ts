@@ -33,6 +33,12 @@ export interface WorkerStat {
   counts: StateCounts
 }
 
+export interface HourlyPoint {
+  hour: number
+  success: number
+  fail: number
+}
+
 export interface WorkerSummary {
   total: number
   ignored: number
@@ -61,6 +67,7 @@ export interface DashboardResponse {
   byInsurer: InsurerStat[] | null
   failureReasons: FailureReasonStat[] | null
   byWorker: WorkerStat[] | null
+  hourly: HourlyPoint[] | null
   lockedAccounts: CompanyLockedSummary[] | null
   trend: (TrendPoint | null)[]
 }
