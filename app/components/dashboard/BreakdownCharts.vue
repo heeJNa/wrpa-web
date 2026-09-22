@@ -28,7 +28,7 @@
       maintainAspectRatio: false,
       plugins: { legend: { labels: { color } } },
       scales: {
-        x: { stacked: true, ticks: { color } },
+        x: { stacked: true, ticks: { color, autoSkip: false } },
         y: { stacked: true, beginAtZero: true, ticks: { color } },
       },
     }
@@ -46,7 +46,9 @@
           title: { display: true, text: '%', color },
           ticks: { color },
         },
-        y: { ticks: { color } },
+        // autoSkip 을 끄지 않으면 chart.js 가 카드 폭에 맞춰 보험사 이름을 건너뛴다 —
+        // 순위 차트에서 이름 없는 막대는 쓸모가 없으므로 전부 그린다.
+        y: { ticks: { color, autoSkip: false } },
       },
     }
   })
@@ -59,7 +61,7 @@
 
 <template>
   <div class="grid grid-cols-1 gap-4 xl:grid-cols-3">
-    <div class="card mb-0 flex h-80 flex-col">
+    <div class="card mb-0 flex h-96 flex-col">
       <h3 class="mb-2 text-sm font-semibold">회사별 성공 / 실패</h3>
       <Chart
         class="min-h-0 flex-1"
@@ -70,7 +72,7 @@
       <p class="text-surface-500 text-sm" v-else-if="company">작업 없음</p>
       <p class="text-surface-500 text-sm" v-else>(조회 실패)</p>
     </div>
-    <div class="card mb-0 flex h-80 flex-col">
+    <div class="card mb-0 flex h-96 flex-col">
       <h3 class="mb-2 text-sm font-semibold">보험사별 실패율 상위 10</h3>
       <Chart
         class="min-h-0 flex-1"
@@ -81,7 +83,7 @@
       <p class="text-surface-500 text-sm" v-else-if="insurer">집계할 작업 없음</p>
       <p class="text-surface-500 text-sm" v-else>(조회 실패)</p>
     </div>
-    <div class="card mb-0 flex h-80 flex-col">
+    <div class="card mb-0 flex h-96 flex-col">
       <h3 class="mb-2 text-sm font-semibold">상태 분포</h3>
       <Chart
         class="min-h-0 flex-1"

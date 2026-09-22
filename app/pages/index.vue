@@ -65,7 +65,7 @@
     <div class="card flex flex-wrap items-center gap-3">
       <h2 class="mr-auto text-lg font-semibold">RPA 대시보드</h2>
       <DatePicker
-        class="w-40"
+        class="w-44"
         v-model="workDate"
         date-format="yy-mm-dd"
         show-icon
