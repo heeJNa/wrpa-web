@@ -4,6 +4,7 @@
   import type { AccountListItem } from '~/types/account'
   import type { JobTypesEnum } from '~/types/enum'
   import type { Job, JobTypes } from '~/types/job'
+  import { ACTIVE_BASIS_OPTIONS, resolveWindowDates } from '~/types/active-window'
 
   const { insuranceCompanyCodes, teams } = useGlobalData()
   const { request } = useClientAPI()
@@ -18,6 +19,28 @@
 
   const companyId = ref<string>()
   const insuranceCompanyCode = ref<string>()
+
+  // 이번 달 기준 실제 생성일 안내 — 영업일 기준이면 서버의 월별 영업일 목록으로 환산
+  const monthDates = ref<string[]>([])
+  const yearMonth = formatToKoreanTime(new Date(), 'YYYY-MM')
+  const windowHint = computed(() => {
+    const r = resolveWindowDates(
+      jobForm.value.activeBasis,
+      jobForm.value.activeFrom,
+      jobForm.value.activeTo,
+      monthDates.value,
+      yearMonth,
+    )
+    if (!r) return '이번 달에는 생성일이 없습니다'
+    return `이번 달 실제 생성일: ${r.first} ~ ${r.last}`
+  })
+  watch(
+    () => jobForm.value.activeBasis,
+    (b) => {
+      if (b === 'BUSINESS_DAY') jobForm.value.excludeHoliday = false
+    },
+  )
+
   onMounted(async () => {
     const job = dialogRef.value.data as Job
     if (job) {
@@ -27,6 +50,10 @@
       isCreateMode.value = false
       await initJobDependencies()
     }
+    const { data } = await request<{ month: string; dates: string[] }>(
+      `/api/business-day-order/business-days?month=${yearMonth}`,
+    )
+    monthDates.value = data.value?.dates ?? []
   })
 
   const createJob = () => {
@@ -214,24 +241,41 @@
       </DialogForm>
       <div></div>
       <div class="col-span-2 flex justify-between gap-4">
-        <DialogForm label="시작일" :error="errors?.startDate" required>
+        <DialogForm label="생성 범위 기준" :error="errors?.activeBasis" required>
           <template #input>
-            <InputText
-              id="startDate"
-              v-model="jobForm.startDate"
-              autocomplete="off"
-              :invalid="!!errors?.startDate"
-              placeholder="1 ~ 31" />
+            <SelectButton
+              id="activeBasis"
+              v-model="jobForm.activeBasis"
+              :options="ACTIVE_BASIS_OPTIONS"
+              option-label="label"
+              option-value="value"
+              :allow-empty="false" />
           </template>
         </DialogForm>
-        <DialogForm label="종료일" :error="errors?.endDate" required>
+        <DialogForm label="시작" :error="errors?.activeFrom">
           <template #input>
-            <InputText
-              id="endDate"
-              v-model="jobForm.endDate"
-              autocomplete="off"
-              :invalid="!!errors?.endDate"
-              placeholder="1 ~ 31" />
+            <InputNumber
+              id="activeFrom"
+              v-model="jobForm.activeFrom"
+              :min="1"
+              :max="31"
+              showButtons
+              fluid
+              :invalid="!!errors?.activeFrom"
+              placeholder="비움=1" />
+          </template>
+        </DialogForm>
+        <DialogForm label="종료" :error="errors?.activeTo">
+          <template #input>
+            <InputNumber
+              id="activeTo"
+              v-model="jobForm.activeTo"
+              :min="1"
+              :max="31"
+              showButtons
+              fluid
+              :invalid="!!errors?.activeTo"
+              placeholder="비움=무제한" />
           </template>
         </DialogForm>
         <DialogForm label="시간" :error="errors?.workTime" required>
@@ -245,6 +289,7 @@
           </template>
         </DialogForm>
       </div>
+      <small class="text-surface-500 col-span-2">{{ windowHint }}</small>
       <div class="col-span-2 flex gap-4">
         <DialogForm
           class="flex-1/5"
@@ -315,6 +360,7 @@
         </DialogForm>
         <DialogForm
           class="flex-auto text-center"
+          v-if="jobForm.activeBasis === 'CALENDAR_DAY'"
           label="휴일제외"
           :error="errors?.excludeHoliday">
           <template #input>
@@ -325,36 +371,6 @@
               ">
               <Checkbox id="excludeHoliday" v-model="jobForm.excludeHoliday" binary />
             </div>
-          </template>
-        </DialogForm>
-        <DialogForm
-          class="flex-1/3"
-          label="유효 영업일 시작"
-          :error="errors?.activeBizDayFrom">
-          <template #input>
-            <InputNumber
-              id="activeBizDayFrom"
-              v-model="jobForm.activeBizDayFrom"
-              :min="1"
-              :max="31"
-              showButtons
-              fluid
-              placeholder="기본 1" />
-          </template>
-        </DialogForm>
-        <DialogForm
-          class="flex-1/3"
-          label="유효 영업일 종료"
-          :error="errors?.activeBizDayTo">
-          <template #input>
-            <InputNumber
-              id="activeBizDayTo"
-              v-model="jobForm.activeBizDayTo"
-              :min="1"
-              :max="99"
-              showButtons
-              fluid
-              placeholder="비움=무제한(월말까지)" />
           </template>
         </DialogForm>
       </div>
