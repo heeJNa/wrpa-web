@@ -20,6 +20,11 @@ function shortDate(d: string): string {
   return d.slice(5)
 }
 
+/** 실패율을 소수점 한 자리로 반올림 (0.123 → 12.3) */
+function roundPercent(rate: number): number {
+  return Math.round(rate * 1000) / 10
+}
+
 /** 최근 N일: 막대(처리량) + 선(실패율 %, 우측 축). 백필 실패한 날은 null 로 비운다 */
 export function trendChartData(trend: (TrendPoint | null)[]) {
   return {
@@ -40,7 +45,7 @@ export function trendChartData(trend: (TrendPoint | null)[]) {
         backgroundColor: CHART_COLORS.line,
         tension: 0.3,
         spanGaps: false,
-        data: trend.map((p) => (p ? Math.round(p.counts.failRate * 1000) / 10 : null)),
+        data: trend.map((p) => (p ? roundPercent(p.counts.failRate) : null)),
       },
     ],
   }
@@ -79,7 +84,7 @@ export function insurerFailRateData(byInsurer: InsurerStat[], topN = 10) {
       {
         label: '실패율(%)',
         backgroundColor: CHART_COLORS.fail,
-        data: ranked.map((i) => Math.round(i.counts.failRate * 1000) / 10),
+        data: ranked.map((i) => roundPercent(i.counts.failRate)),
       },
     ],
   }
