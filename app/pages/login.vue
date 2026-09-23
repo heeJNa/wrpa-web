@@ -118,7 +118,7 @@
                 >ID</label
               >
               <InputText
-                class="w-full md:w-[30rem]"
+                class="w-full"
                 id="id"
                 v-model="id"
                 type="text"
