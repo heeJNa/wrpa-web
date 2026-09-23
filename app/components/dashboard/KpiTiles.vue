@@ -52,7 +52,7 @@
       class="border-surface-100 bg-surface-0 dark:border-surface-800 dark:bg-surface-900 rounded-xl border px-4 py-3.5"
       v-for="tile in tiles"
       :key="tile.label">
-      <div class="text-surface-400 text-xs font-medium">{{ tile.label }}</div>
+      <div class="text-surface-500 text-[13px] font-medium">{{ tile.label }}</div>
       <div
         class="text-surface-800 dark:text-surface-100 mt-1.5 text-[1.6rem] leading-none font-semibold tracking-tight"
         :class="{
@@ -62,7 +62,7 @@
         }">
         {{ tile.value ?? '(조회 실패)' }}
       </div>
-      <div class="text-surface-400 mt-2 text-xs leading-relaxed" v-if="tile.sub">{{ tile.sub }}</div>
+      <div class="text-surface-500 mt-2 text-[12px] leading-relaxed" v-if="tile.sub">{{ tile.sub }}</div>
     </div>
   </div>
 </template>

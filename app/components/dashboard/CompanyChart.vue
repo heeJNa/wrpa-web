@@ -1,7 +1,8 @@
 <script setup lang="ts">
   import type { CompanyStat } from '~/types/dashboard'
   import {
-    chartGridColor,
+    
+  CHART_FONT,chartGridColor,
     chartTextColor,
     companyChartData,
   } from '~/utils/dashboardChart'
@@ -22,6 +23,7 @@
         legend: {
           labels: {
             color,
+            font: CHART_FONT,
             usePointStyle: true,
             pointStyle: 'circle',
             padding: 16,
@@ -35,10 +37,10 @@
         x: {
           stacked: true,
           beginAtZero: true,
-          ticks: { color },
+          ticks: { color, font: CHART_FONT },
           grid: { color: gridColor },
         },
-        y: { stacked: true, ticks: { color, autoSkip: false }, grid: { display: false } },
+        y: { stacked: true, ticks: { color, autoSkip: false, font: CHART_FONT }, grid: { display: false } },
       },
     }
   })

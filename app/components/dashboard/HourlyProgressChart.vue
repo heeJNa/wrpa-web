@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { HourlyPoint } from '~/types/dashboard'
-  import { chartTextColor,
+  import { 
+  CHART_FONT,chartTextColor,
   chartGridColor, hourlyProgressData } from '~/utils/dashboardChart'
 
   const props = defineProps<{
@@ -20,22 +21,29 @@
       maintainAspectRatio: false,
       interaction: { mode: 'index' as const, intersect: false },
       plugins: {
-        legend: { labels: { color, usePointStyle: true, pointStyle: 'circle', padding: 16, boxWidth: 8 } },
+        legend: { labels: {
+            color,
+            font: CHART_FONT,
+            usePointStyle: true,
+            pointStyle: 'circle',
+            padding: 16,
+            boxWidth: 8,
+          } },
       },
       scales: {
-        x: { ticks: { color }, grid: { color: gridColor } },
+        x: { ticks: { color, font: CHART_FONT }, grid: { color: gridColor } },
         y: {
           stacked: true,
           beginAtZero: true,
-          title: { display: true, text: '건', color },
-          ticks: { color }, grid: { color: gridColor },
+          title: { display: true, text: '건', color, font: CHART_FONT },
+          ticks: { color, font: CHART_FONT }, grid: { color: gridColor },
         },
         y1: {
           beginAtZero: true,
           position: 'right' as const,
 
-          title: { display: true, text: '잔량', color },
-          ticks: { color },
+          title: { display: true, text: '잔량', color, font: CHART_FONT },
+          ticks: { color, font: CHART_FONT },
           grid: { drawOnChartArea: false },
         },
       },

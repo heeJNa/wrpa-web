@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { WorkerStat } from '~/types/dashboard'
-  import { chartTextColor,
+  import { 
+  CHART_FONT,chartTextColor,
   chartGridColor, workerChartData } from '~/utils/dashboardChart'
 
   const props = defineProps<{
@@ -19,13 +20,20 @@
       maintainAspectRatio: false,
       indexAxis: 'y' as const,
       plugins: {
-        legend: { labels: { color, usePointStyle: true, pointStyle: 'circle', padding: 16, boxWidth: 8 } },
+        legend: { labels: {
+            color,
+            font: CHART_FONT,
+            usePointStyle: true,
+            pointStyle: 'circle',
+            padding: 16,
+            boxWidth: 8,
+          } },
       },
       scales: {
-        x: { stacked: true, beginAtZero: true, ticks: { color }, grid: { color: gridColor } },
+        x: { stacked: true, beginAtZero: true, ticks: { color, font: CHART_FONT }, grid: { color: gridColor } },
         // autoSkip 을 끄지 않으면 chart.js 가 카드 폭에 맞춰 작업자 이름을 건너뛴다 —
         // 순위 차트에서 이름 없는 막대는 쓸모가 없으므로 전부 그린다.
-        y: { stacked: true, ticks: { color, autoSkip: false }, grid: { display: false } },
+        y: { stacked: true, ticks: { color, autoSkip: false, font: CHART_FONT }, grid: { display: false } },
       },
     }
   })

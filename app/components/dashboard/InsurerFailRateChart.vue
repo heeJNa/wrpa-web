@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { InsurerStat } from '~/types/dashboard'
-  import { chartTextColor,
+  import { 
+  CHART_FONT,chartTextColor,
   chartGridColor, insurerFailRateData } from '~/utils/dashboardChart'
 
   const props = defineProps<{
@@ -19,18 +20,25 @@
       maintainAspectRatio: false,
       indexAxis: 'y' as const,
       plugins: {
-        legend: { labels: { color, usePointStyle: true, pointStyle: 'circle', padding: 16, boxWidth: 8 } },
+        legend: { labels: {
+            color,
+            font: CHART_FONT,
+            usePointStyle: true,
+            pointStyle: 'circle',
+            padding: 16,
+            boxWidth: 8,
+          } },
       },
       scales: {
         x: {
           beginAtZero: true,
           suggestedMax: 10,
-          title: { display: true, text: '%', color },
-          ticks: { color }, grid: { color: gridColor },
+          title: { display: true, text: '%', color, font: CHART_FONT },
+          ticks: { color, font: CHART_FONT }, grid: { color: gridColor },
         },
         // autoSkip 을 끄지 않으면 chart.js 가 카드 폭에 맞춰 보험사 이름을 건너뛴다 —
         // 순위 차트에서 이름 없는 막대는 쓸모가 없으므로 전부 그린다.
-        y: { ticks: { color, autoSkip: false }, grid: { display: false } },
+        y: { ticks: { color, autoSkip: false, font: CHART_FONT }, grid: { display: false } },
       },
     }
   })

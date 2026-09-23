@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { FailureReasonStat } from '~/types/dashboard'
-  import { chartTextColor,
+  import { 
+  CHART_FONT,chartTextColor,
   chartGridColor, failureReasonData } from '~/utils/dashboardChart'
 
   const props = defineProps<{
@@ -20,10 +21,10 @@
       indexAxis: 'y' as const,
       plugins: { legend: { display: false } },
       scales: {
-        x: { beginAtZero: true, ticks: { color }, grid: { color: gridColor } },
+        x: { beginAtZero: true, ticks: { color, font: CHART_FONT }, grid: { color: gridColor } },
         // autoSkip 을 끄지 않으면 chart.js 가 카드 폭에 맞춰 사유 이름을 건너뛴다 —
         // 이름 없는 막대는 쓸모가 없으므로 전부 그린다.
-        y: { ticks: { color, autoSkip: false }, grid: { display: false } },
+        y: { ticks: { color, autoSkip: false, font: CHART_FONT }, grid: { display: false } },
       },
     }
   })

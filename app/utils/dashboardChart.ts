@@ -11,12 +11,8 @@ import type {
 // 상태 의미색은 화면 어디서나 같게 유지한다. 종일 띄워 두는 화면이라 채도를 낮춰
 // 눈이 편하게 하되, '실패'만은 또렷하게 남겨 시선이 거기로 가게 한다.
 export const CHART_COLORS = {
-  success: '#6aa88a',
+  success: '#4f8fbf',
   fail: '#d9534f',
-  waiting: '#b8b5ae',
-  working: '#7b96c4',
-  cancel: '#d6a75c',
-  etc: '#dcd9d3',
   // 선 그래프는 '실패' 막대(빨강)와 겹쳐 그려지므로 다른 색이어야 범례에서 구분된다.
   // 시간대별 '미완료 잔량'과 30일 '실패율'이 같은 색을 쓴다 — 둘 다 막대 위의 추세선이다.
   backlog: '#8878b8',
@@ -33,6 +29,9 @@ export function chartGridColor(dark: boolean): string {
 export function percent(rate: number): string {
   return `${(rate * 100).toFixed(1)}%`
 }
+
+/** 축·범례 글자 크기. chart.js 기본(12px)보다 한 단계 키워 읽기 쉽게 한다 */
+export const CHART_FONT = { size: 13 }
 
 /** 다크 모드 대응 차트 텍스트(범례/눈금/축 제목) 색상 */
 export function chartTextColor(dark: boolean): string {
