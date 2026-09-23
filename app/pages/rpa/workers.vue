@@ -185,10 +185,23 @@
         sortable>
       </Column>
       <Column class="text-center" field="typePretty" header="종류"></Column>
-      <Column class="text-center" field="statePretty" header="상태"></Column>
+      <Column class="text-center" field="statePretty" header="상태">
+        <template #body="slotProps">
+          <Tag
+            v-if="slotProps.data.rebooting"
+            v-tooltip.top="'작업을 마치고 대상 PC·HID를 재부팅하는 중입니다'"
+            value="재부팅 중"
+            severity="info" />
+          <span v-else>{{ slotProps.data.statePretty }}</span>
+        </template>
+      </Column>
       <Column class="text-center" field="hidHealthy" header="HID">
         <template #body="slotProps">
-          <Tag v-if="slotProps.data.hidHealthy === true" value="정상" severity="success" />
+          <Tag
+            v-if="slotProps.data.rebooting && slotProps.data.hidHealthy === false"
+            value="재부팅 중"
+            severity="info" />
+          <Tag v-else-if="slotProps.data.hidHealthy === true" value="정상" severity="success" />
           <Tag v-else-if="slotProps.data.hidHealthy === false" value="장애" severity="danger" />
           <span
             v-else

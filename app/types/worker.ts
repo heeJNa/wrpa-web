@@ -17,6 +17,9 @@ export interface WorkerDetail {
     hidHealthProbed?: boolean | null,
     // 실측이 아니면 null(미확인)
     hidHealthy?: boolean | null,
+    // 워커가 스스로 지시한 재부팅 중(v3 워커). 이 동안 hid 장애·끝난 작업의 작업중은
+    // 계획된 일이다. 마스터가 만료 시각으로 판단하므로 워커가 죽어도 저절로 풀린다.
+    rebooting?: boolean,
     statePretty: string,
     typePretty: string,
     lastConnectedTimePretty: string,
