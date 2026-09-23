@@ -186,6 +186,18 @@
       </Column>
       <Column class="text-center" field="typePretty" header="종류"></Column>
       <Column class="text-center" field="statePretty" header="상태"></Column>
+      <Column class="text-center" field="hidHealthy" header="HID">
+        <template #body="slotProps">
+          <Tag v-if="slotProps.data.hidHealthy === true" value="정상" severity="success" />
+          <Tag v-else-if="slotProps.data.hidHealthy === false" value="장애" severity="danger" />
+          <span
+            v-else
+            v-tooltip.top="'v3 워커만 HID를 실제로 확인합니다'"
+            class="text-surface-400">
+            -
+          </span>
+        </template>
+      </Column>
       <Column class="text-center" field="owners" header="소유자">
         <template #body="slotProps">
           <span v-if="slotProps.data.owners && slotProps.data.owners.length > 0">
