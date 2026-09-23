@@ -9,6 +9,11 @@ dist
 # Node dependencies
 node_modules
 
+# 이 저장소는 pnpm 전용(packageManager: pnpm). 다른 매니저의 락파일이 함께 커밋되면
+# node_modules 가 섞여 pnpm build 가 깨진다 — pnpm-lock.yaml 만 추적한다.
+package-lock.json
+yarn.lock
+
 # Logs
 logs
 *.log

@@ -7,9 +7,10 @@ UI는 [Sakai Nuxt Starter](https://github.com/j0rgedev/sakai-nuxt-starter)를 �
 
 ## 개발 환경
 
-패키지 매니저는 **pnpm**입니다(`packageManager: pnpm@10.12.4`).
-저장소에 `package-lock.json`이 함께 있지만 쓰지 않습니다 — `npm install`을 돌리면
-`node_modules`가 pnpm 트리와 섞여 빌드가 깨집니다(아래 *문제 해결* 참고).
+패키지 매니저는 **pnpm 전용**입니다(`packageManager: pnpm@10.12.4`).
+`npm install`·`yarn` 을 돌리면 `node_modules` 가 pnpm 트리와 섞여 빌드가 깨지므로
+쓰지 마세요(아래 *문제 해결* 참고). 두 매니저의 락파일은 `.gitignore` 로 막아 뒀고,
+추적하는 락파일은 `pnpm-lock.yaml` 하나입니다.
 
 ```bash
 pnpm install
