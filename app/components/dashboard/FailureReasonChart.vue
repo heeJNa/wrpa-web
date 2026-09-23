@@ -1,8 +1,11 @@
 <script setup lang="ts">
   import type { FailureReasonStat } from '~/types/dashboard'
-  import { 
-  CHART_FONT,chartTextColor,
-  chartGridColor, failureReasonData } from '~/utils/dashboardChart'
+  import {
+    CHART_FONT,
+    chartGridColor,
+    chartTextColor,
+    failureReasonData,
+  } from '~/utils/dashboardChart'
 
   const props = defineProps<{
     failureReasons: FailureReasonStat[] | null
@@ -10,7 +13,7 @@
   const { isDarkTheme } = useLayout()
 
   const reasons = computed(() =>
-    props.failureReasons ? failureReasonData(props.failureReasons) : null,
+    props.failureReasons ? failureReasonData(props.failureReasons, isDarkTheme.value) : null,
   )
 
   const options = computed(() => {

@@ -8,14 +8,32 @@ import type {
   WorkerStat,
 } from '~/types/dashboard'
 
-// 상태 의미색은 화면 어디서나 같게 유지한다. 종일 띄워 두는 화면이라 채도를 낮춰
-// 눈이 편하게 하되, '실패'만은 또렷하게 남겨 시선이 거기로 가게 한다.
-export const CHART_COLORS = {
-  success: '#4f8fbf',
-  fail: '#d9534f',
-  // 선 그래프는 '실패' 막대(빨강)와 겹쳐 그려지므로 다른 색이어야 범례에서 구분된다.
-  // 시간대별 '미완료 잔량'과 30일 '실패율'이 같은 색을 쓴다 — 둘 다 막대 위의 추세선이다.
-  backlog: '#8878b8',
+/**
+ * 상태 의미색은 화면 어디서나 같게 유지한다.
+ * 파랑은 '텔레그램 발송' 버튼과 같은 색 — PrimeVue primary 토큰(라이트 primary.500,
+ * 다크 primary.400)의 실제 값이다. chart.js 는 canvas 라 CSS 변수를 못 읽으므로
+ * 토큰 값을 그대로 적어 두고, 테마 프리셋(app/theme/app-theme.ts)의 primary 를 바꾸면
+ * 여기도 같이 바꾼다.
+ * 빨강·보라는 같은 팔레트(red / violet)의 같은 단계라 파랑과 채도·명도가 한 짝으로 맞는다.
+ */
+const PALETTE = {
+  light: {
+    success: '#3b82f6', // = primary.500 (blue.500), 텔레그램 발송 버튼 색
+    fail: '#ef4444', // red.500
+    // 선 그래프는 '실패' 막대(빨강)와 겹쳐 그려지므로 다른 색이어야 범례에서 구분된다.
+    // 시간대별 '미완료 잔량'과 30일 '실패율'이 같은 색을 쓴다 — 둘 다 막대 위의 추세선이다.
+    backlog: '#8b5cf6', // violet.500
+  },
+  dark: {
+    success: '#60a5fa', // = primary.400, 다크 모드 버튼 색
+    fail: '#f87171', // red.400
+    backlog: '#a78bfa', // violet.400
+  },
+} as const
+
+/** 다크 모드에서는 버튼과 같이 한 단계 밝은 톤(400)을 쓴다 */
+export function chartColors(dark: boolean) {
+  return dark ? PALETTE.dark : PALETTE.light
 }
 
 /** 막대가 하나뿐일 때 화면 절반을 덮지 않도록 제한한다 */
@@ -54,7 +72,8 @@ function roundPercent(rate: number): number {
  * 같은 막대를 성공/실패로 쪼개고 비율을 선으로 겹친다.
  * order 가 작을수록 위에 그려진다 — 실패율 선이 막대에 가리지 않게 한다.
  */
-export function trendChartData(trend: (TrendPoint | null)[]) {
+export function trendChartData(trend: (TrendPoint | null)[], dark: boolean) {
+  const C = chartColors(dark)
   return {
     labels: trend.map((p) => (p ? shortDate(p.workDate) : '')),
     datasets: [
@@ -63,8 +82,8 @@ export function trendChartData(trend: (TrendPoint | null)[]) {
         label: '실패율(%)',
         yAxisID: 'y1',
         order: 0,
-        borderColor: CHART_COLORS.backlog,
-        backgroundColor: CHART_COLORS.backlog,
+        borderColor: C.backlog,
+        backgroundColor: C.backlog,
         borderWidth: 2,
         pointRadius: 2,
         tension: 0.3,
@@ -79,7 +98,7 @@ export function trendChartData(trend: (TrendPoint | null)[]) {
         stack: 'trend',
         maxBarThickness: MAX_BAR_THICKNESS,
         borderRadius: 3,
-        backgroundColor: CHART_COLORS.success,
+        backgroundColor: C.success,
         data: trend.map((p) => (p ? p.counts.success : null)),
       },
       {
@@ -90,7 +109,7 @@ export function trendChartData(trend: (TrendPoint | null)[]) {
         stack: 'trend',
         maxBarThickness: MAX_BAR_THICKNESS,
         borderRadius: 3,
-        backgroundColor: CHART_COLORS.fail,
+        backgroundColor: C.fail,
         data: trend.map((p) => (p ? p.counts.fail : null)),
       },
     ],
@@ -98,20 +117,21 @@ export function trendChartData(trend: (TrendPoint | null)[]) {
 }
 
 /** 회사별 성공/실패 누적막대 */
-export function companyChartData(byCompany: CompanyStat[]) {
+export function companyChartData(byCompany: CompanyStat[], dark: boolean) {
+  const C = chartColors(dark)
   return {
     labels: byCompany.map((c) => c.companyName),
     datasets: [
       {
         label: '성공',
-        backgroundColor: CHART_COLORS.success,
+        backgroundColor: C.success,
         maxBarThickness: MAX_BAR_THICKNESS,
         borderRadius: 3,
         data: byCompany.map((c) => c.counts.success),
       },
       {
         label: '실패',
-        backgroundColor: CHART_COLORS.fail,
+        backgroundColor: C.fail,
         maxBarThickness: MAX_BAR_THICKNESS,
         borderRadius: 3,
         data: byCompany.map((c) => c.counts.fail),
@@ -121,7 +141,8 @@ export function companyChartData(byCompany: CompanyStat[]) {
 }
 
 /** 보험사별 실패율 상위 N(가로막대). 성공+실패가 0 인 보험사는 제외 */
-export function insurerFailRateData(byInsurer: InsurerStat[], topN = 10) {
+export function insurerFailRateData(byInsurer: InsurerStat[], dark: boolean, topN = 10) {
+  const C = chartColors(dark)
   const ranked = byInsurer
     // 실패가 0인 보험사는 뺀다 — '실패율 상위'에 0% 줄이 끼면 자리만 차지한다
     .filter((i) => i.counts.fail > 0)
@@ -136,7 +157,7 @@ export function insurerFailRateData(byInsurer: InsurerStat[], topN = 10) {
     datasets: [
       {
         label: '실패율(%)',
-        backgroundColor: CHART_COLORS.fail,
+        backgroundColor: C.fail,
         maxBarThickness: MAX_BAR_THICKNESS,
         borderRadius: 3,
         data: ranked.map((i) => roundPercent(i.counts.failRate)),
@@ -146,13 +167,14 @@ export function insurerFailRateData(byInsurer: InsurerStat[], topN = 10) {
 }
 
 /** 실패 사유별 가로막대(실패 건수). 이미 건수 내림차순 정렬된 입력을 그대로 쓴다 */
-export function failureReasonData(reasons: FailureReasonStat[]) {
+export function failureReasonData(reasons: FailureReasonStat[], dark: boolean) {
+  const C = chartColors(dark)
   return {
     labels: reasons.map((r) => `${r.label} (${r.count})`),
     datasets: [
       {
         label: '실패 건수',
-        backgroundColor: CHART_COLORS.fail,
+        backgroundColor: C.fail,
         maxBarThickness: MAX_BAR_THICKNESS,
         borderRadius: 3,
         data: reasons.map((r) => r.count),
@@ -167,7 +189,8 @@ export function failureReasonData(reasons: FailureReasonStat[]) {
  * 대기·취소 건)은 항상 0 이라 막대 없는 빈 줄로 상위 N 자리만 차지한다.
  * 반대로 작업자 문서가 지워져 [미할당]로 묶였지만 실제 실적이 있는 경우는 그대로 보인다.
  */
-export function workerChartData(byWorker: WorkerStat[], topN = 10) {
+export function workerChartData(byWorker: WorkerStat[], dark: boolean, topN = 10) {
+  const C = chartColors(dark)
   const ranked = [...byWorker]
     .filter((w) => w.counts.success + w.counts.fail > 0)
     .sort((a, b) => b.counts.fail - a.counts.fail || b.counts.total - a.counts.total)
@@ -177,14 +200,14 @@ export function workerChartData(byWorker: WorkerStat[], topN = 10) {
     datasets: [
       {
         label: '성공',
-        backgroundColor: CHART_COLORS.success,
+        backgroundColor: C.success,
         maxBarThickness: MAX_BAR_THICKNESS,
         borderRadius: 3,
         data: ranked.map((w) => w.counts.success),
       },
       {
         label: '실패',
-        backgroundColor: CHART_COLORS.fail,
+        backgroundColor: C.fail,
         maxBarThickness: MAX_BAR_THICKNESS,
         borderRadius: 3,
         data: ranked.map((w) => w.counts.fail),
@@ -197,7 +220,12 @@ export function workerChartData(byWorker: WorkerStat[], topN = 10) {
  * 시간대별 성공/실패(누적막대) + 미완료 잔량(선, 우측 축).
  * dayTotal 이 null 이면 총건수를 모르므로 잔량 선은 아예 그리지 않는다.
  */
-export function hourlyProgressData(hourly: HourlyPoint[], dayTotal: number | null) {
+export function hourlyProgressData(
+  hourly: HourlyPoint[],
+  dayTotal: number | null,
+  dark: boolean,
+) {
+  const C = chartColors(dark)
   const datasets: Record<string, unknown>[] = [
     {
       type: 'bar',
@@ -205,7 +233,7 @@ export function hourlyProgressData(hourly: HourlyPoint[], dayTotal: number | nul
       order: 1,
       stack: 'hourly',
       yAxisID: 'y',
-      backgroundColor: CHART_COLORS.success,
+      backgroundColor: C.success,
       maxBarThickness: MAX_BAR_THICKNESS,
       borderRadius: 3,
       data: hourly.map((h) => h.success),
@@ -216,7 +244,7 @@ export function hourlyProgressData(hourly: HourlyPoint[], dayTotal: number | nul
       order: 1,
       stack: 'hourly',
       yAxisID: 'y',
-      backgroundColor: CHART_COLORS.fail,
+      backgroundColor: C.fail,
       maxBarThickness: MAX_BAR_THICKNESS,
       borderRadius: 3,
       data: hourly.map((h) => h.fail),
@@ -234,8 +262,8 @@ export function hourlyProgressData(hourly: HourlyPoint[], dayTotal: number | nul
       label: '미완료 잔량',
       order: 0,
       yAxisID: 'y1',
-      borderColor: CHART_COLORS.backlog,
-      backgroundColor: CHART_COLORS.backlog,
+      borderColor: C.backlog,
+      backgroundColor: C.backlog,
       tension: 0.3,
       data: backlog,
     })

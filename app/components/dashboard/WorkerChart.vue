@@ -1,8 +1,11 @@
 <script setup lang="ts">
   import type { WorkerStat } from '~/types/dashboard'
-  import { 
-  CHART_FONT,chartTextColor,
-  chartGridColor, workerChartData } from '~/utils/dashboardChart'
+  import {
+    CHART_FONT,
+    chartGridColor,
+    chartTextColor,
+    workerChartData,
+  } from '~/utils/dashboardChart'
 
   const props = defineProps<{
     byWorker: WorkerStat[] | null
@@ -10,7 +13,7 @@
   const { isDarkTheme } = useLayout()
 
   const worker = computed(() =>
-    props.byWorker ? workerChartData(props.byWorker, 10) : null,
+    props.byWorker ? workerChartData(props.byWorker, isDarkTheme.value, 10) : null,
   )
 
   const options = computed(() => {

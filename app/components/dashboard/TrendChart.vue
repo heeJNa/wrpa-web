@@ -1,13 +1,19 @@
 <script setup lang="ts">
   import type { TrendPoint } from '~/types/dashboard'
-  import { 
-  CHART_FONT,chartTextColor,
-  chartGridColor, trendChartData } from '~/utils/dashboardChart'
+  import {
+    CHART_FONT,
+    chartGridColor,
+    chartTextColor,
+    trendChartData,
+  } from '~/utils/dashboardChart'
 
   const props = defineProps<{ trend: (TrendPoint | null)[] }>()
   const { isDarkTheme } = useLayout()
+  // 30일치 날짜를 좁은 화면에 다 찍으면 서로 겹쳐 아무것도 못 읽는다.
+  // 모바일에서만 chart.js 가 알아서 건너뛰게 둔다.
+  const isNarrow = useMediaQuery('(max-width: 767.98px)')
 
-  const chartData = computed(() => trendChartData(props.trend ?? []))
+  const chartData = computed(() => trendChartData(props.trend ?? [], isDarkTheme.value))
   const chartOptions = computed(() => {
     const color = chartTextColor(isDarkTheme.value)
     const gridColor = chartGridColor(isDarkTheme.value)
@@ -25,7 +31,15 @@
           } },
       },
       scales: {
-        x: { ticks: { color, autoSkip: false, font: CHART_FONT }, grid: { color: gridColor } },
+        x: {
+          ticks: {
+            color,
+            autoSkip: isNarrow.value,
+            maxRotation: isNarrow.value ? 60 : 50,
+            font: CHART_FONT,
+          },
+          grid: { color: gridColor },
+        },
         y: {
           beginAtZero: true,
           title: { display: true, text: '건', color, font: CHART_FONT },

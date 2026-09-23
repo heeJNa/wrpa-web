@@ -1,8 +1,11 @@
 <script setup lang="ts">
   import type { InsurerStat } from '~/types/dashboard'
-  import { 
-  CHART_FONT,chartTextColor,
-  chartGridColor, insurerFailRateData } from '~/utils/dashboardChart'
+  import {
+    CHART_FONT,
+    chartGridColor,
+    chartTextColor,
+    insurerFailRateData,
+  } from '~/utils/dashboardChart'
 
   const props = defineProps<{
     byInsurer: InsurerStat[] | null
@@ -10,7 +13,7 @@
   const { isDarkTheme } = useLayout()
 
   const insurer = computed(() =>
-    props.byInsurer ? insurerFailRateData(props.byInsurer, 10) : null,
+    props.byInsurer ? insurerFailRateData(props.byInsurer, isDarkTheme.value, 10) : null,
   )
 
   const options = computed(() => {

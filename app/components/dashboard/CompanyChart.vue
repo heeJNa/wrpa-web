@@ -1,8 +1,8 @@
 <script setup lang="ts">
   import type { CompanyStat } from '~/types/dashboard'
   import {
-    
-  CHART_FONT,chartGridColor,
+    CHART_FONT,
+    chartGridColor,
     chartTextColor,
     companyChartData,
   } from '~/utils/dashboardChart'
@@ -11,7 +11,7 @@
   const { isDarkTheme } = useLayout()
 
   const company = computed(() =>
-    props.byCompany ? companyChartData(props.byCompany) : null,
+    props.byCompany ? companyChartData(props.byCompany, isDarkTheme.value) : null,
   )
 
   const options = computed(() => {

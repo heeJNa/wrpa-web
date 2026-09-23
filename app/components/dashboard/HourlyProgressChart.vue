@@ -1,8 +1,11 @@
 <script setup lang="ts">
   import type { HourlyPoint } from '~/types/dashboard'
-  import { 
-  CHART_FONT,chartTextColor,
-  chartGridColor, hourlyProgressData } from '~/utils/dashboardChart'
+  import {
+    CHART_FONT,
+    chartGridColor,
+    chartTextColor,
+    hourlyProgressData,
+  } from '~/utils/dashboardChart'
 
   const props = defineProps<{
     hourly: HourlyPoint[] | null
@@ -11,7 +14,7 @@
   const { isDarkTheme } = useLayout()
 
   const chartData = computed(() =>
-    props.hourly ? hourlyProgressData(props.hourly, props.dayTotal) : null,
+    props.hourly ? hourlyProgressData(props.hourly, props.dayTotal, isDarkTheme.value) : null,
   )
 
   const chartOptions = computed(() => {

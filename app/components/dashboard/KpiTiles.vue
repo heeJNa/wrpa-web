@@ -49,15 +49,15 @@
 <template>
   <div class="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
     <div
-      class="border-surface-100 bg-surface-0 dark:border-surface-800 dark:bg-surface-900 rounded-xl border px-4 py-3.5"
+      class="border-surface-100 bg-surface-0 dark:border-surface-800 dark:bg-surface-900 rounded-xl border px-3 py-3 sm:px-4 sm:py-3.5"
       v-for="tile in tiles"
       :key="tile.label">
       <div class="text-surface-500 text-[13px] font-medium">{{ tile.label }}</div>
       <div
-        class="text-surface-800 dark:text-surface-100 mt-1.5 text-[1.6rem] leading-none font-semibold tracking-tight"
+        class="text-surface-800 dark:text-surface-100 mt-1.5 text-[1.35rem] leading-none font-semibold tracking-tight sm:text-[1.6rem]"
         :class="{
           'text-[#5f9b80] dark:text-[#7fba9c]': tile.tone === 'success',
-          'text-[#cc4b47] dark:text-[#e3706c]': tile.tone === 'danger',
+          'text-[#dc2626] dark:text-[#f87171]': tile.tone === 'danger',
           'text-[#c08f45] dark:text-[#d8a75c]': tile.tone === 'warn',
         }">
         {{ tile.value ?? '(조회 실패)' }}
