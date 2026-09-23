@@ -6,7 +6,9 @@
   const year = ref<number>(new Date().getFullYear())
   const month = ref<number | undefined>(undefined)
   const page = ref(0)
-  const size = ref(500)
+  // 페이지네이터 선택지(25·50·100)에 없는 값이면 '페이지당 행 수'가 빈칸으로 뜬다.
+  // 조회는 연(월) 단위라 한 번에 100건을 넘길 일이 없다.
+  const size = ref(100)
 
   const { data, execute, status } = await useLazyAPI<any>(`/api/holiday`, {
     query: { year, month, page, size },
