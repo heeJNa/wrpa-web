@@ -146,7 +146,7 @@
   <div class="w-full md:w-[90vw] lg:w-[75vw] xl:w-[50vw]">
     <div class="p-datatable-gridlines mb-4">
       <div class="p-datatable-header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-2">
           <h6 class="font-bold">작업 제어</h6>
           <Button
             class="w-btn"
@@ -184,17 +184,32 @@
             {{ data.workStatePretty }}
           </Badge>
         </div>
-        <div class="flex flex-nowrap items-center justify-center gap-4">
-          <label class="block font-bold" for="timeout"> Timeout(ms) </label>
-          <InputNumber v-model="data.lifetime" inputId="timeout" :use-grouping="false" />
-          <span class="text-sm text-gray-500">
+        <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-4">
+          <label class="block font-bold whitespace-nowrap" for="timeout">
+            Timeout(ms)
+          </label>
+          <!-- fluid 가 없으면 안쪽 input 이 브라우저 기본 폭(≈20ch)을 써서 옆 항목을 덮는다 -->
+          <InputNumber
+            class="w-32"
+            v-model="data.lifetime"
+            inputId="timeout"
+            fluid
+            :use-grouping="false" />
+          <span class="text-sm whitespace-nowrap text-gray-500">
             {{ convertTimeoutMsToMinutesString(data.lifetime) }}</span
           >
           <Button class="w-btn" @click="changeTimeout"> 변경 </Button>
         </div>
-        <div class="flex flex-nowrap items-center justify-center gap-4">
-          <label class="block font-bold" for="priority"> 우선순위 </label>
-          <InputNumber v-model="data.priority" inputId="priority" :use-grouping="false" />
+        <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-4">
+          <label class="block font-bold whitespace-nowrap" for="priority">
+            우선순위
+          </label>
+          <InputNumber
+            class="w-24"
+            v-model="data.priority"
+            inputId="priority"
+            fluid
+            :use-grouping="false" />
           <Button class="w-btn" @click="changePriority"> 변경 </Button>
         </div>
       </div>
@@ -225,8 +240,9 @@
       </div>
     </div>
     <DataTable
-      class="mb-4"
+      class="p-datatable-mobile-cards mb-4"
       v-if="data?.filesRaw"
+      :pt="{ column: mobileCardColumnPT }"
       :value="data?.filesRaw || []"
       scrollable
       removable-sort
@@ -234,7 +250,7 @@
       showGridlines
       stripedRows>
       <template #header>
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-2">
           <h6 class="font-bold">파일 목록</h6>
           <Button
             class="w-btn"
@@ -267,7 +283,8 @@
       </Column>
     </DataTable>
     <DataTable
-      class="mb-4"
+      class="p-datatable-mobile-cards mb-4"
+      :pt="{ column: mobileCardColumnPT }"
       :value="
         (data?.stateHistory || []).sort((a: any, b: any) => b.createdTime - a.createdTime)
       "

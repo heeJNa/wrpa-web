@@ -142,15 +142,15 @@
     <div class="card !mb-0 flex flex-col gap-3 !p-4">
       <div class="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 class="text-2xl font-semibold">영업일 순서정책</h2>
+          <h2 class="text-xl font-semibold sm:text-2xl">영업일 순서정책</h2>
           <p class="text-surface-500">
             영업일 구간별로 업로드 카테고리의 실행 순서를 정합니다. 순서만 정하며, 작업
             생성 여부는 작업일정의 유효 영업일 범위가 결정합니다.
           </p>
         </div>
-        <div class="flex flex-wrap items-center gap-2">
+        <div class="flex w-full flex-wrap items-center gap-2 sm:w-auto">
           <Select
-            class="w-56"
+            class="w-full sm:w-56"
             v-model="companyId"
             :options="teams"
             option-label="name"
@@ -160,7 +160,7 @@
             filter
             @change="loadScope" />
           <Select
-            class="w-56"
+            class="w-full sm:w-56"
             v-model="insuranceCompanyCode"
             :options="insuranceCompanyCodes"
             option-label="name"
@@ -170,6 +170,7 @@
             filter
             @change="loadScope" />
           <Button
+            class="w-full sm:w-auto"
             label="불러오기"
             icon="pi pi-refresh"
             severity="secondary"
@@ -213,7 +214,7 @@
       <div
         class="card !mb-0 flex flex-col gap-2 !p-4"
         v-if="!insuranceCompanyCode && savedPolicies.length">
-        <h3 class="text-xl font-semibold">저장된 정책</h3>
+        <h3 class="text-lg font-semibold sm:text-xl">저장된 정책</h3>
         <div class="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           <BusinessDayOrderPolicyCard
             v-for="p in savedPolicies"
@@ -227,7 +228,7 @@
 
       <div class="card !mb-0 flex flex-col gap-3 !p-4">
         <div class="flex flex-wrap items-center justify-between gap-2">
-          <h3 class="text-xl font-semibold">
+          <h3 class="text-lg font-semibold sm:text-xl">
             {{
               insuranceCompanyCode
                 ? `${insurerName(insuranceCompanyCode)} 전용 정책 편집`

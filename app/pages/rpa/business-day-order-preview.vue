@@ -86,15 +86,15 @@
     <div class="card !mb-0 !p-4">
       <div class="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 class="text-2xl font-semibold">순서 미리보기 (시뮬레이션)</h2>
+          <h2 class="text-xl font-semibold sm:text-2xl">순서 미리보기 (시뮬레이션)</h2>
           <p class="text-surface-500">
             선택한 회사·날짜에 자동 생성될 작업과 그 실행 순서를 시뮬레이션합니다. 실제
             작업은 생성되지 않습니다.
           </p>
         </div>
-        <div class="flex flex-wrap items-center gap-2">
+        <div class="flex w-full flex-wrap items-center gap-2 sm:w-auto">
           <Select
-            class="w-56"
+            class="w-full sm:w-56"
             v-model="companyId"
             :options="teams"
             option-label="name"
@@ -102,8 +102,13 @@
             placeholder="회사 선택"
             showClear
             filter />
-          <DatePicker class="w-48" v-model="date" date-format="yy-mm-dd" show-icon />
+          <DatePicker
+            class="w-full sm:w-48"
+            v-model="date"
+            date-format="yy-mm-dd"
+            show-icon />
           <Button
+            class="w-full sm:w-auto"
             label="미리보기"
             icon="pi pi-search"
             :loading="loading"
@@ -135,7 +140,8 @@
       </Message>
 
       <DataTable
-        class="min-h-0 flex-1"
+        class="p-datatable-mobile-cards min-h-0 flex-1"
+        :pt="{ column: mobileCardColumnPT }"
         :value="orderedRows"
         data-key="jobId"
         scrollable

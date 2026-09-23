@@ -218,18 +218,14 @@
       </Column>
       <Column class="text-center" header="다운로드">
         <template #body="slotProps">
-          <Button class="mx-4" size="small" @click="downloadFile(slotProps.data?.file)"
+          <Button size="small" @click="downloadFile(slotProps.data?.file)"
             >다운로드</Button
           >
         </template>
       </Column>
       <Column class="text-center" header="삭제">
         <template #body="slotProps">
-          <Button
-            class="mx-4"
-            :severity="'danger'"
-            size="small"
-            @click="deleteFile(slotProps.data)"
+          <Button :severity="'danger'" size="small" @click="deleteFile(slotProps.data)"
             >삭제</Button
           >
         </template>

@@ -52,15 +52,25 @@
 <template>
   <ListDataTable :data="rows" :status="status" :page="page" :size="size" :use-num="true">
     <template #filters>
-      <div class="flex items-center gap-2">
-        <InputNumber v-model="year" :useGrouping="false" :min="2000" :max="2100" />
+      <!-- fluid 가 없으면 안쪽 input 이 브라우저 기본 폭(≈20ch)을 써서 w-28·w-32 를
+           넘어가고, 그만큼 옆 칸을 덮어 gap 이 사라진다 -->
+      <div class="flex flex-wrap items-center gap-2">
         <InputNumber
+          class="w-24"
+          v-model="year"
+          fluid
+          :useGrouping="false"
+          :min="2000"
+          :max="2100" />
+        <InputNumber
+          class="w-32"
           v-model="month"
+          fluid
           :min="1"
           :max="12"
           placeholder="월(선택)"
           showClear />
-        <Button label="조회" @click="execute()" />
+        <Button class="shrink-0" label="조회" @click="execute()" />
       </div>
     </template>
     <template #buttons>

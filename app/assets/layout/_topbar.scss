@@ -99,9 +99,10 @@
       box-shadow: 0 3px 5px rgba(0, 0, 0, .02), 0 0 2px rgba(0, 0, 0, .05), 0 1px 4px rgba(0, 0, 0, .08);
       border-radius: 12px;
       padding: 1rem;
-      right: 2rem;
-      top: 5rem;
-      min-width: 15rem;
+      right: 1rem;
+      top: 4.5rem;
+      min-width: 13rem;
+      max-width: calc(100vw - 2rem);
       display: none;
       -webkit-animation: scalein 0.15s linear;
       animation: scalein 0.15s linear;

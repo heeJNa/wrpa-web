@@ -16,6 +16,12 @@
   &:last-child {
     margin-bottom: 0;
   }
+
+  // 좁은 화면에서 좌우 2rem 은 내용이 쓸 폭을 그대로 깎는다
+  @media (max-width: 767.98px) {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
 }
 
 .p-toast {

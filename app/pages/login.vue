@@ -58,12 +58,11 @@
 
 <template>
   <div
-    class="bg-surface-50 dark:bg-surface-950 flex min-h-screen min-w-[100vw] items-center justify-center overflow-hidden">
-    <div class="flex flex-col items-center justify-center">
+    class="bg-surface-50 dark:bg-surface-950 flex min-h-dvh w-full items-center justify-center overflow-y-auto p-4">
+    <div class="flex w-full max-w-lg flex-col items-center justify-center">
       <div
+        class="w-full rounded-[2rem] p-[0.3rem] sm:rounded-[56px]"
         style="
-          border-radius: 56px;
-          padding: 0.3rem;
           background: linear-gradient(
             180deg,
             var(--primary-color) 10%,
@@ -71,8 +70,7 @@
           );
         ">
         <div
-          class="bg-surface-0 dark:bg-surface-900 w-full px-8 py-20 sm:px-20"
-          style="border-radius: 53px">
+          class="bg-surface-0 dark:bg-surface-900 w-full rounded-[1.8rem] px-6 py-10 sm:rounded-[53px] sm:px-20 sm:py-20">
           <div class="mb-8 text-center">
             <div class="mb-4 flex items-center justify-center">
               <img class="h-16 w-16" src="/wrpa.png" />
@@ -105,16 +103,17 @@
                   fill="var(--primary-color)" />
               </g>
             </svg> -->
-            <div class="text-surface-900 dark:text-surface-0 mb-4 text-3xl font-medium">
+            <div
+              class="text-surface-900 dark:text-surface-0 mb-4 text-2xl font-medium sm:text-3xl">
               Welcome to WRPA!
             </div>
             <span class="text-muted-color font-medium">Sign in to continue</span>
           </div>
 
           <div>
-            <div class="mb-8 flex flex-col">
+            <div class="mb-6 flex flex-col sm:mb-8">
               <label
-                class="text-surface-900 dark:text-surface-0 mb-2 block text-xl font-medium"
+                class="text-surface-900 dark:text-surface-0 mb-2 block text-lg font-medium sm:text-xl"
                 for="id"
                 >ID</label
               >
@@ -129,7 +128,7 @@
             </div>
             <div class="mb-4 flex flex-col">
               <label
-                class="text-surface-900 dark:text-surface-0 mb-2 block text-xl font-medium"
+                class="text-surface-900 dark:text-surface-0 mb-2 block text-lg font-medium sm:text-xl"
                 for="password1"
                 >Password</label
               >
@@ -146,7 +145,7 @@
               }}</small>
             </div>
 
-            <div class="mt-2 mb-8 flex items-center justify-between gap-8">
+            <div class="mt-2 mb-8 flex flex-wrap items-center justify-between gap-4">
               <div class="flex items-center">
                 <Checkbox class="mr-2" id="rememberme1" v-model="checked" binary />
                 <label for="rememberme1">Remember me</label>

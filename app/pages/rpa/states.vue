@@ -329,7 +329,7 @@
       </FloatLabel>
     </template>
     <template #toolbar-end>
-      <div class="flex items-center gap-3">
+      <div class="flex flex-wrap items-center gap-2 sm:gap-3">
         <Button
           type="button"
           label="텔레그램 보고 발송"
@@ -338,7 +338,8 @@
           outlined
           :loading="sendingReport"
           @click="sendDailyReport(refineWorkDate)" />
-        <span class="text-surface-500 dark:text-surface-100 text-lg font-bold">
+        <span
+          class="text-surface-500 dark:text-surface-100 text-base font-bold sm:text-lg">
           성공 {{ summary?.success || 0 }}건 | 실패 {{ summary?.fail || 0 }}건 | 작업
           {{ summary?.working || 0 }}건 | 대기 {{ summary?.waiting || 0 }}건 | 취소
           {{ summary?.cancel || 0 }}건
@@ -413,7 +414,6 @@
       <Column class="text-center" header="전송">
         <template #body="slotProps">
           <Button
-            class="mx-4"
             :disabled="slotProps.data?.resultStatus !== '200'"
             :severity="slotProps.data?.resultStatus === '200' ? '' : 'secondary'"
             size="small"

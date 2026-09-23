@@ -164,7 +164,9 @@
   }
 </script>
 <template>
-  <div class="w-full sm:w-[80vw] md:w-[50vw] lg:w-[35vw] xl:w-[25vw]">
+  <!-- 이 다이얼로그는 여는 쪽(작업일정 목록)이 폭을 64rem 으로 지정한다.
+       여기서 다시 vw 로 좁히면 넓은 창 안에 좁은 폼만 남으므로 창을 그대로 채운다. -->
+  <div class="w-full">
     <form class="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2" @submit.prevent>
       <DialogForm label="회사명" required>
         <template #input>
@@ -240,7 +242,7 @@
         /></template>
       </DialogForm>
       <div></div>
-      <div class="col-span-2 flex justify-between gap-4">
+      <div class="col-span-2 flex flex-wrap justify-between gap-x-4 gap-y-3">
         <DialogForm
           class="shrink-0"
           label="생성 범위 기준"
@@ -257,7 +259,7 @@
               :allow-empty="false" />
           </template>
         </DialogForm>
-        <DialogForm class="flex-1" label="시작" :error="errors?.activeFrom">
+        <DialogForm class="min-w-24 flex-1" label="시작" :error="errors?.activeFrom">
           <template #input>
             <InputNumber
               id="activeFrom"
@@ -270,7 +272,7 @@
               placeholder="비움=1" />
           </template>
         </DialogForm>
-        <DialogForm class="flex-1" label="종료" :error="errors?.activeTo">
+        <DialogForm class="min-w-24 flex-1" label="종료" :error="errors?.activeTo">
           <template #input>
             <InputNumber
               id="activeTo"
@@ -283,7 +285,11 @@
               placeholder="비움=무제한" />
           </template>
         </DialogForm>
-        <DialogForm class="flex-1" label="시간" :error="errors?.workTime" required>
+        <DialogForm
+          class="min-w-24 flex-1"
+          label="시간"
+          :error="errors?.workTime"
+          required>
           <template #input>
             <InputText
               id="workTime"
@@ -304,9 +310,9 @@
         예전 영업일 범위 {{ dialogRef.data?.legacyBizDayPretty ?? '?' }}가 함께 저장돼
         있습니다. 위 기준·범위를 확정해 저장하면 정리됩니다.
       </Message>
-      <div class="col-span-2 flex gap-4">
+      <div class="col-span-2 flex flex-wrap gap-x-4 gap-y-3">
         <DialogForm
-          class="flex-1/5"
+          class="min-w-20 flex-1/5"
           label="업적월"
           :error="errors?.closingMonthNum"
           required>
@@ -321,7 +327,11 @@
               autocomplete="off" />
           </template>
         </DialogForm>
-        <DialogForm class="flex-1/5" label="우선순위" :error="errors?.priority" required>
+        <DialogForm
+          class="min-w-20 flex-1/5"
+          label="우선순위"
+          :error="errors?.priority"
+          required>
           <template #input>
             <InputNumber
               id="priority"
@@ -334,7 +344,7 @@
           </template>
         </DialogForm>
         <DialogForm
-          class="flex-auto"
+          class="min-w-44 flex-auto"
           label="Timeout(ms)"
           :error="errors?.lifetime"
           required>
@@ -353,7 +363,10 @@
             </div>
           </template>
         </DialogForm>
-        <DialogForm class="flex-auto text-center" :error="errors?.locked" label="잠금">
+        <DialogForm
+          class="min-w-16 flex-auto text-center"
+          :error="errors?.locked"
+          label="잠금">
           <template #input>
             <div class="flex h-full items-center justify-center">
               <Checkbox id="locked" v-model="jobForm.locked" binary />
@@ -361,9 +374,9 @@
           </template>
         </DialogForm>
       </div>
-      <div class="col-span-2 flex gap-4">
+      <div class="col-span-2 flex flex-wrap gap-x-4 gap-y-3">
         <DialogForm
-          class="flex-auto text-center"
+          class="min-w-32 flex-auto text-center"
           label="수동 우선순위 고정"
           :error="errors?.priorityManual">
           <template #input>

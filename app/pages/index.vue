@@ -18,32 +18,40 @@
   <div class="flex flex-col gap-5 pb-10">
     <div class="card !mb-0 flex flex-wrap items-center gap-x-4 gap-y-3">
       <h2 class="text-lg font-semibold">RPA 대시보드</h2>
-      <div class="flex items-center gap-2">
-        <label class="text-surface-500 text-sm" for="dashboard-work-date">기준일</label>
+      <div class="flex min-w-0 flex-1 items-center gap-2 sm:flex-none">
+        <label class="text-surface-500 shrink-0 text-sm" for="dashboard-work-date"
+          >기준일</label
+        >
         <DatePicker
-          class="w-44"
+          class="w-full sm:w-44"
           input-id="dashboard-work-date"
           v-model="workDate"
           date-format="yy-mm-dd"
           show-icon
           :max-date="today" />
       </div>
-      <div class="text-surface-400 mr-auto text-xs">
+      <!-- 좁은 화면에서는 집계 시각이 버튼을 밀어내지 않도록 맨 아래 한 줄로 내린다 -->
+      <div
+        class="text-surface-400 order-last w-full text-xs sm:order-none sm:mr-auto sm:w-auto">
         <span v-if="generatedAt">{{ generatedAt }} 집계</span>
         <span class="text-red-500" v-if="lastError">{{ lastError }}</span>
       </div>
-      <Button
-        label="새로고침"
-        icon="pi pi-refresh"
-        severity="secondary"
-        outlined
-        :loading="loading"
-        @click="refresh" />
-      <Button
-        label="텔레그램 발송"
-        icon="pi pi-send"
-        :loading="sending"
-        @click="sendReport(formatToKoreanTime(workDate, 'YYYY-MM-DD'))" />
+      <div class="flex w-full flex-wrap items-center gap-2 sm:w-auto">
+        <Button
+          class="flex-1 sm:flex-none"
+          label="새로고침"
+          icon="pi pi-refresh"
+          severity="secondary"
+          outlined
+          :loading="loading"
+          @click="refresh" />
+        <Button
+          class="flex-1 sm:flex-none"
+          label="텔레그램 발송"
+          icon="pi pi-send"
+          :loading="sending"
+          @click="sendReport(formatToKoreanTime(workDate, 'YYYY-MM-DD'))" />
+      </div>
     </div>
 
     <template v-if="data">
@@ -56,7 +64,7 @@
       <DashboardHourlyProgressChart
         :hourly="data.hourly"
         :day-total="data.totals ? data.totals.total - data.totals.cancel : null" />
-      <div class="grid grid-cols-1 gap-4 xl:grid-cols-3">
+      <div class="grid grid-cols-1 gap-3 sm:gap-4 xl:grid-cols-3">
         <DashboardFailureReasonChart :failure-reasons="data.failureReasons" />
         <DashboardWorkerChart :by-worker="data.byWorker" />
         <DashboardInsurerFailRateChart :by-insurer="data.byInsurer" />
@@ -64,7 +72,7 @@
       <DashboardIssueTables
         :workers="data.workers"
         :locked-accounts="data.lockedAccounts" />
-      <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
+      <div class="grid grid-cols-1 gap-3 sm:gap-4 xl:grid-cols-2">
         <DashboardCompanyChart :by-company="data.byCompany" />
         <DashboardTrendChart :trend="data.trend" />
       </div>
