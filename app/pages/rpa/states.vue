@@ -10,6 +10,20 @@
   const { request } = useClientAPI()
   const confirm = useConfirm()
 
+  const lastAttemptStartedPretty = (work: any): string => {
+    const attempt = lastAttemptTimes(work?.stateHistory)
+    if (!attempt) return cutYearIfSame(work?.startedTimePretty)
+    return cutYearIfSame(formatToKoreanTime(new Date(attempt.startedTime), 'YYYY-MM-DD HH:mm'))
+  }
+
+  // 진행 중(재시도 대기 포함)인 작업은 이전 시도 시간이 보이지 않게 '-'
+  const lastAttemptDurationPretty = (work: any): string => {
+    if (work?.workState !== 'success' && work?.workState !== 'fail') return '-'
+    const attempt = lastAttemptTimes(work?.stateHistory)
+    if (attempt?.finishedTime == null) return '-'
+    return formatDurationMs(attempt.finishedTime - attempt.startedTime)
+  }
+
   const workDate = ref<Date>(new Date())
   const companyId = ref<string>()
   const insuranceCompanyType = ref<string>()
@@ -396,7 +410,7 @@
       </Column>
       <Column class="text-center" header="시작일시">
         <template #body="slotProps">
-          <span>{{ cutYearIfSame(slotProps.data?.startedTimePretty) }} </span>
+          <span>{{ lastAttemptStartedPretty(slotProps.data) }} </span>
         </template>
       </Column>
       <Column class="text-center" header="Timeout(ms)">
@@ -408,7 +422,7 @@
       </Column>
       <Column class="text-center" header="소요시간">
         <template #body="slotProps">
-          <span>{{ slotProps.data?.workTimePretty || '-' }} </span>
+          <span>{{ lastAttemptDurationPretty(slotProps.data) }} </span>
         </template>
       </Column>
       <Column class="text-center" header="전송">
